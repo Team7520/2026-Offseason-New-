@@ -7,8 +7,8 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final TalonFX extendMotor;
     private final TalonFX intakeMotor;
+    private final TalonFX extendMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public IntakeSubsystem() {
