@@ -7,7 +7,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretSubsystem extends SubsystemBase {
-    private final TalonFX turnMotor;
+    private final TalonFX azimuthMotor;
     private final TalonFX hoodMotor;
     private final TalonFX topMotor;
     private final TalonFX bottomMotor;
@@ -15,7 +15,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem() {
         hoodMotor = new TalonFX(1);
-        turnMotor = new TalonFX(2);
+        azimuthMotor = new TalonFX(2);
         topMotor = new TalonFX(3);
         bottomMotor = new TalonFX(4); // placeholder ids
 
@@ -28,8 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
-        turnMotor.getConfigurator().apply(config);
-        turnMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        azimuthMotor.getConfigurator().apply(config);
+        azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
         config.Slot0.kP = 0;
         config.Slot0.kI = 0;
@@ -38,7 +38,7 @@ public class TurretSubsystem extends SubsystemBase {
         config.CurrentLimits.StatorCurrentLimit = 20;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
-        
+
         hoodMotor.getConfigurator().apply(config);
         hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
@@ -66,7 +66,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void turn(double speed) {
-        turnMotor.setControl(duty.withOutput(speed));
+        azimuthMotor.setControl(duty.withOutput(speed));
     }
 
     public void hood(double speed) {
@@ -82,7 +82,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stopAll() {
-        turnMotor.setControl(duty.withOutput(0));
+        azimuthMotor.setControl(duty.withOutput(0));
         hoodMotor.setControl(duty.withOutput(0));
         topMotor.setControl(duty.withOutput(0));
         bottomMotor.setControl(duty.withOutput(0));

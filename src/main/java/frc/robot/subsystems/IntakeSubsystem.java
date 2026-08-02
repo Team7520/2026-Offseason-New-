@@ -2,38 +2,47 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX intakeMotor;
     private final TalonFX extendMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
+    private final PositionDutyCycle pivotPosReq = new PositionDutyCycle(0);
+    double extendedPosition = -16.5; // placeholder value
+    double retractedPosition = -5; // placeholder value
+    private final double CURRENT_THRESHOLD = -20; // placeholder value
 
     public IntakeSubsystem() {
-        intakeMotor = new TalonFX(1);
-        extendMotor = new TalonFX(2); // placeholder ids
+        intakeMotor = new TalonFX(1); // placeholder id
+        extendMotor = new TalonFX(2); // placeholder id
         
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
+        config.Slot0.kP = 0; // placeholder value
+        config.Slot0.kI = 0; // placeholder value
+        config.Slot0.kD = 0; // placeholder value
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
+        config.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
 
         intakeMotor.getConfigurator().apply(config);
         intakeMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
+        config.Slot0.kP = 0; // placeholder value
+        config.Slot0.kI = 0; // placeholder value
+        config.Slot0.kD = 0; // placeholder value
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
+        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
         extendMotor.getConfigurator().apply(config);
         extendMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
@@ -43,12 +52,70 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.setControl(duty.withOutput(speed));
     }
 
-    public void extend(double speed) {
+    public void extendSpin(double speed) {
         extendMotor.setControl(duty.withOutput(speed));
+    }
+
+    public void extend() {
+        extendMotor.setControl(pivotPosReq.withPosition(extendedPosition));
+    }
+
+    public void retractWithSpeed() {
+        extendMotor.setControl(pivotPosReq.withPosition(retractedPosition).withVelocity(0.05)); // placeholder value
+    }
+
+    public void retract() {
+        extendMotor.setControl(pivotPosReq.withPosition(retractedPosition));
     }
 
     public void stopAll() {
         intakeMotor.setControl(duty.withOutput(0));
         extendMotor.setControl(duty.withOutput(0));
+    }
+
+    public void resetPosition(double position) {
+        extendMotor.setPosition(position);
+    }
+
+    public double getExtendedPosition() {
+        return extendedPosition;
+    }
+
+    public void setCoast() {
+        extendMotor.setControl(new CoastOut());
+    }
+
+    public void setNeutralforCurrent() {
+        double currentDraw = extendMotor.getTorqueCurrent().getValueAsDouble();
+        if (currentDraw <= CURRENT_THRESHOLD) {
+            setCoast();
+        }
+    }
+
+    public Command extendIntake() {
+        return Commands.run(() -> extend(), this).until(() -> atTarget(extendedPosition));
+        // .finallyDo(() -> setNeutral());
+    }
+
+    public Command retractIntake() {
+        return Commands.runOnce(() -> retract(), this);
+    }
+
+    public Command slowRetract() {
+        return Commands.runOnce(() -> retractWithSpeed(), this);
+    }
+
+    public boolean atTarget(double position) {
+        double current = extendMotor.getPosition().getValueAsDouble();
+        double error = Math.abs(position - current);
+        // System.out.print(error);
+        return error < 0.1;
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber(
+            "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
     }
 }

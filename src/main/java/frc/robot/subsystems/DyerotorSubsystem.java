@@ -7,27 +7,25 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DyerotorSubsystem extends SubsystemBase {
-    private final TalonFX inMotor;
-    private final TalonFX upMotor;
-    private final TalonFX spinMotor;
+    private final TalonFX wheelMotor;
+    private final TalonFX dyeMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public DyerotorSubsystem() {
-        inMotor = new TalonFX(1);
-        upMotor = new TalonFX(2);
-        spinMotor = new TalonFX(3); // placeholder ids
+        wheelMotor = new TalonFX(1);
+        dyeMotor = new TalonFX(2); // placeholder ids
         
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 0;
         config.Slot0.kI = 0;
         config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        config.CurrentLimits.SupplyCurrentLimit = 20;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
 
-        inMotor.getConfigurator().apply(config);
-        inMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        wheelMotor.getConfigurator().apply(config);
+        wheelMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
         config.Slot0.kP = 0;
         config.Slot0.kI = 0;
@@ -37,33 +35,20 @@ public class DyerotorSubsystem extends SubsystemBase {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
 
-        upMotor.getConfigurator().apply(config);
-        upMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
-
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
-
-        spinMotor.getConfigurator().apply(config);
-        spinMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        dyeMotor.getConfigurator().apply(config);
+        dyeMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
     }
 
-    public void ballGoUp(double speed1, double speed2) {
-        inMotor.setControl(duty.withOutput(speed1));
-        upMotor.setControl(duty.withOutput(speed2));
+    public void spinWheel(double speed) {
+        wheelMotor.setControl(duty.withOutput(speed));
     }
 
-    public void spinMiddle(double speed) {
-        spinMotor.setControl(duty.withOutput(speed));
+    public void spinDye(double speed) {
+        dyeMotor.setControl(duty.withOutput(speed));
     }
 
     public void stopAll() {
-        inMotor.setControl(duty.withOutput(0));
-        upMotor.setControl(duty.withOutput(0));
-        spinMotor.setControl(duty.withOutput(0));
+        wheelMotor.setControl(duty.withOutput(0));
+        dyeMotor.setControl(duty.withOutput(0));
     }
 }
