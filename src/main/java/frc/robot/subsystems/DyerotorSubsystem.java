@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DyeConstants;
 
 public class DyerotorSubsystem extends SubsystemBase {
     private final TalonFX wheelMotor;
@@ -12,8 +13,8 @@ public class DyerotorSubsystem extends SubsystemBase {
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public DyerotorSubsystem() {
-        wheelMotor = new TalonFX(1);
-        dyeMotor = new TalonFX(2); // placeholder ids
+        wheelMotor = new TalonFX(DyeConstants.WHEEL_MOTOR_ID);
+        dyeMotor = new TalonFX(DyeConstants.DYE_MOTOR_ID); // placeholder ids
         
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 0;

@@ -5,6 +5,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.TurretConstants;
 
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX azimuthMotor;
@@ -14,10 +15,10 @@ public class TurretSubsystem extends SubsystemBase {
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public TurretSubsystem() {
-        hoodMotor = new TalonFX(1);
-        azimuthMotor = new TalonFX(2);
-        topMotor = new TalonFX(3);
-        bottomMotor = new TalonFX(4); // placeholder ids
+        hoodMotor = new TalonFX(TurretConstants.HOOD_MOTOR_ID);
+        azimuthMotor = new TalonFX(TurretConstants.AZIMUTH_MOTOR_ID);
+        topMotor = new TalonFX(TurretConstants.TOP_MOTOR_ID);
+        bottomMotor = new TalonFX(TurretConstants.BOTTOM_MOTOR_ID); // placeholder ids
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 0;

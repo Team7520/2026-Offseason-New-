@@ -5,15 +5,19 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final TalonFX intakeMotor;
+    private final TalonFX intakeMotorLeft;
+    private final TalonFX intakeMotorRight;
     private final TalonFX extendMotor;
+    private final TalonFX blockerMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionDutyCycle pivotPosReq = new PositionDutyCycle(0);
     double extendedPosition = -16.5; // placeholder value
@@ -21,8 +25,10 @@ public class IntakeSubsystem extends SubsystemBase {
     private final double CURRENT_THRESHOLD = -20; // placeholder value
 
     public IntakeSubsystem() {
-        intakeMotor = new TalonFX(1); // placeholder id
-        extendMotor = new TalonFX(2); // placeholder id
+        intakeMotorLeft = new TalonFX(IntakeConstants.INTAKE_MOTOR_LEFT_ID);
+        intakeMotorRight = new TalonFX(IntakeConstants.INTAKE_MOTOR_RIGHT_ID);
+        extendMotor = new TalonFX(IntakeConstants.EXTEND_MOTOR_ID);
+        blockerMotor = new TalonFX(IntakeConstants.BLOCKER_MOTOR_ID); // Placeholder IDs
         
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Slot0.kP = 0; // placeholder value
@@ -33,8 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
 
-        intakeMotor.getConfigurator().apply(config);
-        intakeMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        intakeMotorLeft.getConfigurator().apply(config);
+        intakeMotorLeft.setNeutralMode(NeutralModeValue.Brake);
+        intakeMotorRight.getConfigurator().apply(config);
+        intakeMotorRight.setNeutralMode(NeutralModeValue.Brake);
 
         config.Slot0.kP = 0; // placeholder value
         config.Slot0.kI = 0; // placeholder value
@@ -45,11 +53,23 @@ public class IntakeSubsystem extends SubsystemBase {
         config.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
         extendMotor.getConfigurator().apply(config);
-        extendMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        extendMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        config.Slot0.kP = 0; // placeholder value
+        config.Slot0.kI = 0; // placeholder value
+        config.Slot0.kD = 0; // placeholder value
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
+
+        blockerMotor.getConfigurator().apply(config);
+        blockerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public void runIntake(double speed) {
-        intakeMotor.setControl(duty.withOutput(speed));
+        intakeMotorLeft.setControl(duty.withOutput(speed));
+        intakeMotorRight.setControl(duty.withOutput(-speed));
     }
 
     public void extendSpin(double speed) {
@@ -69,8 +89,10 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void stopAll() {
-        intakeMotor.setControl(duty.withOutput(0));
+        intakeMotorLeft.setControl(duty.withOutput(0));
+        intakeMotorRight.setControl(duty.withOutput(0));
         extendMotor.setControl(duty.withOutput(0));
+        blockerMotor.setControl(duty.withOutput(0));
     }
 
     public void resetPosition(double position) {
