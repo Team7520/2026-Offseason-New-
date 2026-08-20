@@ -3,11 +3,11 @@
   "LastState": 11,
   "Modules": [
     {
-      "ModuleName": "Front Left",
+      "ModuleName": "Front Right",
       "ModuleId": 0,
       "Encoder": {
         "Id": 13,
-        "Name": "Front Left Cancoder",
+        "Name": "Front Right Cancoder",
         "Model": "CANCoder vers. H",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -15,7 +15,7 @@
       },
       "SteerMotor": {
         "Id": 12,
-        "Name": "Front Left Angle",
+        "Name": "Front Right Angle",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -28,7 +28,7 @@
       },
       "DriveMotor": {
         "Id": 11,
-        "Name": "Front Left Drive",
+        "Name": "Front Right Drive",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -52,11 +52,11 @@
       "ValidatedEncoderId": 13
     },
     {
-      "ModuleName": "Front Right",
+      "ModuleName": "Back Left",
       "ModuleId": 1,
       "Encoder": {
         "Id": 23,
-        "Name": "Front Right Cancoder",
+        "Name": "Back Left Cancoder",
         "Model": "CANCoder",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -64,7 +64,7 @@
       },
       "SteerMotor": {
         "Id": 22,
-        "Name": "Front Right Angle",
+        "Name": "Back Left Angle",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -77,7 +77,7 @@
       },
       "DriveMotor": {
         "Id": 21,
-        "Name": "Front Right Drive",
+        "Name": "Back Left Drive",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -101,11 +101,11 @@
       "ValidatedEncoderId": 23
     },
     {
-      "ModuleName": "Back Left",
+      "ModuleName": "Back Right",
       "ModuleId": 2,
       "Encoder": {
         "Id": 33,
-        "Name": "Back Left Cancoder",
+        "Name": "Back Right Cancoder",
         "Model": "CANCoder vers. H",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -113,7 +113,7 @@
       },
       "SteerMotor": {
         "Id": 32,
-        "Name": "Back Left Angle",
+        "Name": "Back Right Angle",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -126,7 +126,7 @@
       },
       "DriveMotor": {
         "Id": 31,
-        "Name": "Back Left Drive",
+        "Name": "Back Right Drive",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -150,7 +150,7 @@
       "ValidatedEncoderId": 33
     },
     {
-      "ModuleName": "Back Right",
+      "ModuleName": "Front Left",
       "ModuleId": 3,
       "Encoder": {
         "Id": 43,
@@ -162,7 +162,7 @@
       },
       "SteerMotor": {
         "Id": 42,
-        "Name": "Back Right Angle",
+        "Name": "Front Left Angle",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
@@ -175,7 +175,7 @@
       },
       "DriveMotor": {
         "Id": 41,
-        "Name": "Back Right Drive",
+        "Name": "Front Left Drive",
         "Model": "Talon FX vers. C",
         "CANbus": "rio",
         "CANbusFriendly": "",
