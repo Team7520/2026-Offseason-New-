@@ -10,16 +10,32 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.TurretSubsystem; 
+import frc.robot.subsystems.DyerotorSubsystem; 
+import frc.robot.subsystems.IntakeSubsystem; 
 
 public class RobotContainer {
+    // Subsystems
+    private final TurretSubsystem turret;
+    private final DyerotorSubsystem dyerotor;
+    private final IntakeSubsystem intake;
+
+    // Controller
+    private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
+
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -37,6 +53,11 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+        turret = new TurretSubsystem();
+        dyerotor = new DyerotorSubsystem();
+        intake = new IntakeSubsystem();
+
+        // Configure the button bindings
         configureBindings();
     }
 
@@ -51,6 +72,34 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+        // Testing the dyerotor
+        driver
+        .rightTrigger()
+        .whileTrue(
+            dyerotor
+                .intakeDye(0.2))
+        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+
+        driver
+        .leftTrigger()
+        .whileTrue(
+            dyerotor
+                .intakeDye(-0.2))
+        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+
+        driver
+        .rightBumper()
+        .whileTrue(
+            dyerotor
+                .intakeWheel(-0.2))
+        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+
+        driver
+        .leftBumper()
+        .whileTrue(
+            dyerotor
+                .intakeWheel(0.2))
+        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.

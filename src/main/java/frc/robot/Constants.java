@@ -9,8 +9,8 @@ public class Constants {
     }
 
     public static class DyeConstants {
-        public static final int WHEEL_MOTOR_ID = 0;
         public static final int DYE_MOTOR_ID = 1;
+        public static final int WHEEL_MOTOR_ID = 2;
     }
 
     public static class TurretConstants {
