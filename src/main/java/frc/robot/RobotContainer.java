@@ -76,30 +76,41 @@ public class RobotContainer {
         driver
         .rightTrigger()
         .whileTrue(
-            dyerotor
-                .intakeDye(0.2))
-        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+            turret
+            .shoot(0.6))
+            .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
         driver
         .leftTrigger()
         .whileTrue(
-            dyerotor
-                .intakeDye(-0.2))
-        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+            turret
+            .turnHood(0.1))
+            .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
         driver
         .rightBumper()
         .whileTrue(
             dyerotor
-                .intakeWheel(-0.2))
-        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+            .intakeDyeAndWheel(0.4, -0.5))
+            .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
+        
+        
 
         driver
         .leftBumper()
         .whileTrue(
+            turret
+            .turnHood(-0.1))
+            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+        
+        /*
+        driver
+        .rightBumper()
+        .whileTrue(
             dyerotor
-                .intakeWheel(0.2))
-        .onFalse(new InstantCommand(() -> dyerotor.stopAll()));
+            .intakeDyeAndWheel(0.4, -0.5))
+            .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
+        */
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
