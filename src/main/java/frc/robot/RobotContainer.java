@@ -72,6 +72,11 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+
+        // dyerotor.setDefaultCommand(
+            // dyerotor.reverseDye(-0.1)
+        // );
+
         // Testing the shooter
         driver
         .rightTrigger()
@@ -91,7 +96,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             dyerotor
-            .intakeDyeAndWheel(0.4, -0.5))
+            .intakeDyeAndWheel(0.5, -0.6))
             .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
 
         driver
