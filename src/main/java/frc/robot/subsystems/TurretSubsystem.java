@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
@@ -47,6 +48,16 @@ public class TurretSubsystem extends SubsystemBase {
         config.CurrentLimits.StatorCurrentLimit = 20;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        
+        SoftwareLimitSwitchConfigs limits = new SoftwareLimitSwitchConfigs();
+        limits.ForwardSoftLimitEnable = true;
+        limits.ForwardSoftLimitThreshold = 3;
+        limits.ReverseSoftLimitEnable = true;
+        limits.ReverseSoftLimitThreshold = 0; 
+
+        config.SoftwareLimitSwitch = limits;
+
+        hoodMotor.setPosition(0);
 
         hoodMotor.getConfigurator().apply(config);
         hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
@@ -116,5 +127,11 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorLeft.setControl(duty.withOutput(0));
         bottomMotor.setControl(duty.withOutput(0));
         rotateMotor.setControl(duty.withOutput(0));
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+        System.out.println("Hood Position: " + hoodMotor.getPosition());
     }
 }
