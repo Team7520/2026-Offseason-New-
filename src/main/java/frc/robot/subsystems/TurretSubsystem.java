@@ -33,45 +33,45 @@ public class TurretSubsystem extends SubsystemBase {
         config.Slot0.kI = 0;
         config.Slot0.kD = 0; // placeholder values
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
+        config.CurrentLimits.StatorCurrentLimit = 60;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
         azimuthMotor.getConfigurator().apply(config);
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        // config.Slot0.kP = 0;
-        // config.Slot0.kI = 0;
-        // config.Slot0.kD = 0; // placeholder values
-        // config.CurrentLimits.StatorCurrentLimitEnable = true;
-        // config.CurrentLimits.StatorCurrentLimit = 20;
-        // config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        config.Slot0.kP = 0;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0; // placeholder values
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 20;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
-        // hoodMotor.getConfigurator().apply(config);
-        // hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        hoodMotor.getConfigurator().apply(config);
+        hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        // config.Slot0.kP = 0;
-        // config.Slot0.kI = 0;
-        // config.Slot0.kD = 0; // placeholder values
-        // config.CurrentLimits.StatorCurrentLimitEnable = true;
-        // config.CurrentLimits.StatorCurrentLimit = 20;
-        // config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        config.Slot0.kP = 0;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0; // placeholder values
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 100;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 100; // placeholder values
 
-        // topMotor.getConfigurator().apply(config);
-        // topMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        topMotorLeft.getConfigurator().apply(config);
+        topMotorLeft.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        // config.Slot0.kP = 0;
-        // config.Slot0.kI = 0;
-        // config.Slot0.kD = 0; // placeholder values
-        // config.CurrentLimits.StatorCurrentLimitEnable = true;
-        // config.CurrentLimits.StatorCurrentLimit = 20;
-        // config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        config.Slot0.kP = 0;
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0; // placeholder values
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 100;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = 100; // placeholder values
 
-        // bottomMotor.getConfigurator().apply(config);
-        // bottomMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        topMotorRight.getConfigurator().apply(config);
+        topMotorRight.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
     }
 
     public void turn(double speed) {

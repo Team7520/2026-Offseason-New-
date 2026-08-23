@@ -62,15 +62,11 @@ public class DyerotorSubsystem extends SubsystemBase {
         wheelMotor.setControl(duty.withOutput(speed2));
     }
 
-    public Command intakeDyeAndWheel(double speed1, double speed2){
+    public Command intakeDyeAndWheel(double speed1, double speed2) {
         return Commands.run(() -> spinDyeAndWheel(speed1, speed2), this);
     }
 
-    public Command intakeDye(double speed) {
+    public Command reverseDye(double speed) {
         return Commands.run(() -> spinDye(speed), this);
-    }
-
-    public Command intakeWheel(double speed) {
-        return Commands.run(() -> spinWheel(speed), this);
     }
 }

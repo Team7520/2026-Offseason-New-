@@ -72,7 +72,7 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        // Testing the dyerotor
+        // Testing the shooter
         driver
         .rightTrigger()
         .whileTrue(
@@ -93,8 +93,6 @@ public class RobotContainer {
             dyerotor
             .intakeDyeAndWheel(0.4, -0.5))
             .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
-        
-        
 
         driver
         .leftBumper()
@@ -102,15 +100,6 @@ public class RobotContainer {
             turret
             .turnHood(-0.1))
             .onFalse(new InstantCommand(() -> turret.stopAll()) );
-        
-        /*
-        driver
-        .rightBumper()
-        .whileTrue(
-            dyerotor
-            .intakeDyeAndWheel(0.4, -0.5))
-            .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
-        */
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
