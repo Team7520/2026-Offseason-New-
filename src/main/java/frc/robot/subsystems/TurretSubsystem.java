@@ -1,69 +1,91 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.DyeConstants;;
 
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX azimuthMotor;
     private final TalonFX hoodMotor;
-    private final TalonFX topMotor;
+    private final TalonFX topMotorLeft;
+    private final TalonFX topMotorRight;
     private final TalonFX bottomMotor;
+    private final TalonFX rotateMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public TurretSubsystem() {
+        rotateMotor = new TalonFX(DyeConstants.DYE_ROTATE_MOTOR_ID);
         hoodMotor = new TalonFX(TurretConstants.HOOD_MOTOR_ID);
         azimuthMotor = new TalonFX(TurretConstants.AZIMUTH_MOTOR_ID);
-        topMotor = new TalonFX(TurretConstants.TOP_MOTOR_ID);
+        topMotorLeft = new TalonFX(TurretConstants.TOP_MOTOR_ID_LEFT);
+        topMotorRight = new TalonFX(TurretConstants.TOP_MOTOR_ID_RIGHT);
+
         bottomMotor = new TalonFX(TurretConstants.BOTTOM_MOTOR_ID); // placeholder ids
 
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
+        azimuthConfig.Slot0.kP = 0;
+        azimuthConfig.Slot0.kI = 0;
+        azimuthConfig.Slot0.kD = 0; // placeholder values
+        azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 60;
+        azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
-        azimuthMotor.getConfigurator().apply(config);
+        azimuthMotor.getConfigurator().apply(azimuthConfig);
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
+        hoodConfig.Slot0.kP = 0;
+        hoodConfig.Slot0.kI = 0;
+        hoodConfig.Slot0.kD = 0; // placeholder values
+        hoodConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        hoodConfig.CurrentLimits.StatorCurrentLimit = 20;
+        hoodConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        hoodConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
-        hoodMotor.getConfigurator().apply(config);
+        SoftwareLimitSwitchConfigs limits = new SoftwareLimitSwitchConfigs();
+        limits.ForwardSoftLimitEnable = true;
+        limits.ForwardSoftLimitThreshold = 3;
+        limits.ReverseSoftLimitEnable = true;
+        limits.ReverseSoftLimitThreshold = 0; 
+
+        hoodConfig.SoftwareLimitSwitch = limits;
+
+        hoodMotor.setPosition(0);
+
+        hoodMotor.getConfigurator().apply(hoodConfig);
         hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        TalonFXConfiguration topLeftConfig = new TalonFXConfiguration();
+        topLeftConfig.Slot0.kP = 0;
+        topLeftConfig.Slot0.kI = 0;
+        topLeftConfig.Slot0.kD = 0; // placeholder values
+        topLeftConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        topLeftConfig.CurrentLimits.StatorCurrentLimit = 100;
+        topLeftConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        topLeftConfig.CurrentLimits.SupplyCurrentLimit = 100; // placeholder values
 
-        topMotor.getConfigurator().apply(config);
-        topMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        topMotorLeft.getConfigurator().apply(topLeftConfig);
+        topMotorLeft.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        TalonFXConfiguration topRightConfig = new TalonFXConfiguration();
+        topRightConfig.Slot0.kP = 0;
+        topRightConfig.Slot0.kI = 0;
+        topRightConfig.Slot0.kD = 0; // placeholder values
+        topRightConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        topRightConfig.CurrentLimits.StatorCurrentLimit = 100;
+        topRightConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        topRightConfig.CurrentLimits.SupplyCurrentLimit = 100; // placeholder values
 
-        bottomMotor.getConfigurator().apply(config);
-        bottomMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+        topMotorRight.getConfigurator().apply(topRightConfig);
+        topMotorRight.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
     }
 
     public void turn(double speed) {
@@ -75,17 +97,38 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void top(double speed) {
-        topMotor.setControl(duty.withOutput(speed));
+        topMotorRight.setControl(duty.withOutput(-speed));
+        topMotorLeft.setControl(duty.withOutput(speed));
     }
-
+    public Command shoot(double speed) {
+        return Commands.run(() -> top(speed), this);
+    }
+    public Command turnHood(double speed) {
+        return Commands.run(() -> hood(speed), this);
+    }
+    
     public void bottom(double speed) {
         bottomMotor.setControl(duty.withOutput(speed));
+    }
+    public Command turnBottom(double speed) {
+        return Commands.run(() -> bottom(speed), this);
+    }
+
+    public void rotateDiThing(double speed1,double speed2) {
+        rotateMotor.setControl(duty.withOutput(speed1));
+        bottomMotor.setControl(duty.withOutput(speed2));
+    }
+
+    public Command turnRotate(double speed1,double speed2) {
+        return Commands.run(() -> rotateDiThing(speed1,speed2), this);
     }
 
     public void stopAll() {
         azimuthMotor.setControl(duty.withOutput(0));
         hoodMotor.setControl(duty.withOutput(0));
-        topMotor.setControl(duty.withOutput(0));
+        topMotorRight.setControl(duty.withOutput(0));
+        topMotorLeft.setControl(duty.withOutput(0));
         bottomMotor.setControl(duty.withOutput(0));
+        rotateMotor.setControl(duty.withOutput(0));
     }
 }

@@ -9,14 +9,15 @@ public class Constants {
     }
 
     public static class DyeConstants {
-        public static final int WHEEL_MOTOR_ID = 0;
-        public static final int DYE_MOTOR_ID = 1;
+        public static final int DYE_ROTATE_MOTOR_ID = 1;
+        public static final int DYE_WHEEL_MOTOR_ID = 2;
     }
 
     public static class TurretConstants {
-        public static final int AZIMUTH_MOTOR_ID = 0;
-        public static final int HOOD_MOTOR_ID = 1;
-        public static final int TOP_MOTOR_ID = 2;
-        public static final int BOTTOM_MOTOR_ID = 3;
+        public static final int AZIMUTH_MOTOR_ID = 54;
+        public static final int HOOD_MOTOR_ID = 53;
+        public static final int TOP_MOTOR_ID_LEFT = 52;
+        public static final int TOP_MOTOR_ID_RIGHT = 51;
+        public static final int BOTTOM_MOTOR_ID = 2;
     }
 }
