@@ -4,12 +4,16 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
-import frc.robot.Constants.DyeConstants;;
+import frc.robot.generated.TunerConstants;
+import frc.robot.Constants.DyeConstants;
+
+import java.lang.Math.abs;
 
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX azimuthMotor;
@@ -19,6 +23,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX bottomMotor;
     private final TalonFX rotateMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
+    private final PositionDutyCycle pos = new PositionDutyCycle(0);
 
     public TurretSubsystem() {
         rotateMotor = new TalonFX(DyeConstants.DYE_ROTATE_MOTOR_ID);
@@ -90,6 +95,26 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void turn(double speed) {
         azimuthMotor.setControl(duty.withOutput(speed));
+    }
+
+    public double getAzimuth() {
+        return azimuthMotor.getPosition().getValueAsDouble() / TurretConstants.AZIMUTH_GEAR_RATIO;
+    }
+
+    public void setAzimuth(double angle) {
+        double rotations = angle / 360.0;
+        double curRotations = getAzimuth();
+
+        double[] options = {rotations, rotations + 1, rotations - 1};
+        double best = 1000.0;
+        double bestChoice = -1;
+        for (double d : options) {
+            if (d > TurretConstants.AZIMUTH_LOWER_LIMIT && d < TurretConstants.AZIMUTH_UPPER_LIMIT && Math.abs(d - curRotations) < best) {
+                best = Math.abs(d - curRotations);
+                bestChoice = d;
+            }
+        }
+        azimuthMotor.setControl(pos.withPosition(bestChoice * TurretConstants.AZIMUTH_GEAR_RATIO));
     }
 
     public void hood(double speed) {

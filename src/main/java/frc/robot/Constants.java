@@ -19,5 +19,9 @@ public class Constants {
         public static final int TOP_MOTOR_ID_LEFT = 52;
         public static final int TOP_MOTOR_ID_RIGHT = 51;
         public static final int BOTTOM_MOTOR_ID = 2;
+
+        public static final double AZIMUTH_GEAR_RATIO = 53.2;
+        public static final double AZIMUTH_LOWER_LIMIT = -1.0;
+        public static final double AZIMUTH_UPPER_LIMIT = 1.0;
     }
 }
