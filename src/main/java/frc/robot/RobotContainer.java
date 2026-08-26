@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+import frc.robot.commands.ReverseWheels;
+
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
@@ -96,7 +98,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             dyerotor
-            .intakeDyeAndWheel(0.5, -0.6))
+            .intakeDyeAndWheel(0.5, 0.6))
             .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
 
         driver
@@ -105,6 +107,9 @@ public class RobotContainer {
             turret
             .turnHood(-0.1))
             .onFalse(new InstantCommand(() -> turret.stopAll()) );
+
+        driver
+        .y().whileTrue(new ReverseWheels(dyerotor, -0.6, turret, -0.6));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
