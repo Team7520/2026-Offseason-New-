@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -19,7 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX extendMotor;
     private final TalonFX blockerMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
-    private final PositionDutyCycle pivotPosReq = new PositionDutyCycle(0);
+    private final PositionDutyCycle pos = new PositionDutyCycle(0);
     double extendedPosition = -16.5; // placeholder value
     double retractedPosition = -5; // placeholder value
     private final double CURRENT_THRESHOLD = -20; // placeholder value
@@ -67,36 +68,75 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
+    // BLOCKER functions
+
+    public void extendBlocker() {
+        blockerMotor.setControl(pos.withPosition(IntakeConstants.BLOCKER_EXTEND));
+    }
+
+    public void retractBlocker() {
+        blockerMotor.setControl(pos.withPosition(IntakeConstants.BLOCKER_RETRACT));
+    }
+
+    public boolean blockerAtTarget(double position) {
+        double current = blockerMotor.getPosition().getValueAsDouble();
+        double error = Math.abs(position - current);
+        return error < 0.1;
+    }
+
+    public Command blockerManual(double power) {
+        return Commands.runOnce(() -> blockerMotor.set(power), this);
+    }
+
+    public Command blockerToggle() {
+        if (blockerAtTarget(IntakeConstants.BLOCKER_RETRACT)) { // Extending
+            return new SequentialCommandGroup(retractIntake(), Commands.run(() -> extendBlocker(), this));
+        } else { // Retracting
+            return Commands.run(() -> retractBlocker(), this);
+        }
+    }
+
+    // INTAKE functions
+
     public void runIntake(double speed) {
         intakeMotorLeft.setControl(duty.withOutput(speed));
         intakeMotorRight.setControl(duty.withOutput(-speed));
     }
+
+    public void stopIntake() {
+        intakeMotorLeft.setControl(duty.withOutput(0));
+        intakeMotorRight.setControl(duty.withOutput(0));
+    }
+
+    // EXTEND/RETRACT functions
 
     public void extendSpin(double speed) {
         extendMotor.setControl(duty.withOutput(speed));
     }
 
     public void extend() {
-        extendMotor.setControl(pivotPosReq.withPosition(extendedPosition));
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
     }
 
-    public void retractWithSpeed() {
-        extendMotor.setControl(pivotPosReq.withPosition(retractedPosition).withVelocity(0.05)); // placeholder value
+    public void retractWithSpeed(double speed) {
+        extendMotor.setControl(pos.withPosition(retractedPosition).withVelocity(speed)); // placeholder value
+        stopIntake();
     }
 
     public void retract() {
-        extendMotor.setControl(pivotPosReq.withPosition(retractedPosition));
-    }
-
-    public void stopAll() {
-        intakeMotorLeft.setControl(duty.withOutput(0));
-        intakeMotorRight.setControl(duty.withOutput(0));
-        extendMotor.setControl(duty.withOutput(0));
-        blockerMotor.setControl(duty.withOutput(0));
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT));
+        stopIntake();
     }
 
     public void resetPosition(double position) {
         extendMotor.setPosition(position);
+    }
+    
+    public boolean atTarget(double position) {
+        double current = extendMotor.getPosition().getValueAsDouble();
+        double error = Math.abs(position - current);
+        // System.out.print(error);
+        return error < 0.1;
     }
 
     public double getExtendedPosition() {
@@ -124,14 +164,16 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command slowRetract() {
-        return Commands.runOnce(() -> retractWithSpeed(), this);
+        return Commands.runOnce(() -> retractWithSpeed(0.05), this);
     }
 
-    public boolean atTarget(double position) {
-        double current = extendMotor.getPosition().getValueAsDouble();
-        double error = Math.abs(position - current);
-        // System.out.print(error);
-        return error < 0.1;
+    // OTHER functions
+
+    public void stopAll() {
+        intakeMotorLeft.setControl(duty.withOutput(0));
+        intakeMotorRight.setControl(duty.withOutput(0));
+        extendMotor.setControl(duty.withOutput(0));
+        blockerMotor.setControl(duty.withOutput(0));
     }
 
     @Override
