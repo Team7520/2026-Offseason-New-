@@ -31,40 +31,42 @@ public class IntakeSubsystem extends SubsystemBase {
         extendMotor = new TalonFX(IntakeConstants.EXTEND_MOTOR_ID);
         blockerMotor = new TalonFX(IntakeConstants.BLOCKER_MOTOR_ID); // Placeholder IDs
         
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 0; // placeholder value
-        config.Slot0.kI = 0; // placeholder value
-        config.Slot0.kD = 0; // placeholder value
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
+        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+        intakeConfig.Slot0.kP = 0; // placeholder value
+        intakeConfig.Slot0.kI = 0; // placeholder value
+        intakeConfig.Slot0.kD = 0; // placeholder value
+        intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
+        intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
 
-        intakeMotorLeft.getConfigurator().apply(config);
+        intakeMotorLeft.getConfigurator().apply(intakeConfig);
         intakeMotorLeft.setNeutralMode(NeutralModeValue.Brake);
-        intakeMotorRight.getConfigurator().apply(config);
+        intakeMotorRight.getConfigurator().apply(intakeConfig);
         intakeMotorRight.setNeutralMode(NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0; // placeholder value
-        config.Slot0.kI = 0; // placeholder value
-        config.Slot0.kD = 0; // placeholder value
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
+        TalonFXConfiguration extendConfig = new TalonFXConfiguration();
+        extendConfig.Slot0.kP = 0; // placeholder value
+        extendConfig.Slot0.kI = 0; // placeholder value
+        extendConfig.Slot0.kD = 0; // placeholder value
+        extendConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        extendConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        extendConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
-        extendMotor.getConfigurator().apply(config);
+        extendMotor.getConfigurator().apply(extendConfig);
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
 
-        config.Slot0.kP = 0; // placeholder value
-        config.Slot0.kI = 0; // placeholder value
-        config.Slot0.kD = 0; // placeholder value
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
+        TalonFXConfiguration blockerConfig = new TalonFXConfiguration();
+        blockerConfig.Slot0.kP = 0; // placeholder value
+        blockerConfig.Slot0.kI = 0; // placeholder value
+        blockerConfig.Slot0.kD = 0; // placeholder value
+        blockerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        blockerConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        blockerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        blockerConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
-        blockerMotor.getConfigurator().apply(config);
+        blockerMotor.getConfigurator().apply(blockerConfig);
         blockerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
