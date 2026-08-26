@@ -78,19 +78,17 @@ public class RobotContainer {
         // );
 
         // Testing the shooter
-        driver
-        .rightTrigger()
-        .whileTrue(
-            turret
-            .shoot(0.6))
-            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+        driver.rightTrigger().whileTrue(
+            turret.shoot(0.6)
+        ).onFalse(
+            new InstantCommand(() -> turret.stopAll()) 
+        );
 
-        driver
-        .leftTrigger()
-        .whileTrue(
-            turret
-            .turnHood(0.1))
-            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+        driver.leftTrigger().whileTrue(
+            turret.turnHood(0.1)
+        ).onFalse(
+            new InstantCommand(() -> turret.stopAll()) 
+        );
 
         driver.rightBumper().whileTrue(
             dyerotor.intakeDyeAndWheel(0.5, -0.6)
@@ -114,6 +112,18 @@ public class RobotContainer {
             intake.blockerManual(-0.05)
         ).onFalse(
             intake.blockerManual(0.0)
+        );
+
+        driver.x().whileTrue(
+            Commands.run(() -> intake.manualExtend(0.05))
+        ).onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
+
+        driver.y().whileTrue(
+            Commands.run(() -> intake.manualExtend(-0.05))
+        ).onFalse(
+            new InstantCommand(() -> intake.stopAll())
         );
 
         // Idle while the robot is disabled. This ensures the configured

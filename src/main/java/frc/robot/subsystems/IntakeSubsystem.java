@@ -110,7 +110,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // EXTEND/RETRACT functions
 
-    public void extendSpin(double speed) {
+    public void manualExtend(double speed) {
         extendMotor.setControl(duty.withOutput(speed));
     }
 
