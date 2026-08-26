@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
-import frc.robot.generated.TunerConstants;
 import frc.robot.Constants.DyeConstants;
 
-import java.lang.Math.abs;
+import java.lang.Math;
 
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX azimuthMotor;
