@@ -52,11 +52,6 @@ public class DyerotorSubsystem extends SubsystemBase {
         wheelMotor.setControl(duty.withOutput(-speed));
     }
 
-    public void stopAll() {
-        rotateMotor.setControl(duty.withOutput(0));
-        wheelMotor.setControl(duty.withOutput(0));
-    }
-
     public void spinDyeAndWheel(double speed1, double speed2) {
         rotateMotor.setControl(duty.withOutput(speed1));
         wheelMotor.setControl(duty.withOutput(-speed2));
@@ -72,5 +67,10 @@ public class DyerotorSubsystem extends SubsystemBase {
 
     public Command reverseWheel(double speed) {
         return Commands.run(() -> spinWheel(-speed), this);
+    }
+
+    public void stopAll() {
+        rotateMotor.setControl(duty.withOutput(0));
+        wheelMotor.setControl(duty.withOutput(0));
     }
 }

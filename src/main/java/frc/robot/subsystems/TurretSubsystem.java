@@ -108,13 +108,6 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorRight.setControl(duty.withOutput(-speed));
         topMotorLeft.setControl(duty.withOutput(speed));
     }
-
-    public void stopAll() {
-        azimuthMotor.setControl(duty.withOutput(0));
-        hoodMotor.setControl(duty.withOutput(0));
-        topMotorRight.setControl(duty.withOutput(0));
-        topMotorLeft.setControl(duty.withOutput(0));
-    }
         
     public Command shoot(double speed) {
         return Commands.run(() -> spinFlywheels(speed), this);
@@ -122,5 +115,12 @@ public class TurretSubsystem extends SubsystemBase {
 
     public Command turnHood(double speed) {
         return Commands.run(() -> hood(speed), this);
+    }
+    
+    public void stopAll() {
+        azimuthMotor.setControl(duty.withOutput(0));
+        hoodMotor.setControl(duty.withOutput(0));
+        topMotorRight.setControl(duty.withOutput(0));
+        topMotorLeft.setControl(duty.withOutput(0));
     }
 }

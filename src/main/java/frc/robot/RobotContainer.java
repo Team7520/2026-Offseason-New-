@@ -36,7 +36,6 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
-    private final CommandXboxController operator = new CommandXboxController(1);
 
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -98,7 +97,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             dyerotor
-            .intakeDyeAndWheel(0.5, 0.6))
+            .intakeDyeAndWheel(0.5, 0.9))
             .onFalse(new InstantCommand(() -> dyerotor.stopAll()) );
 
         driver
@@ -109,8 +108,23 @@ public class RobotContainer {
             .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
         driver
-        .y().whileTrue(new ReverseWheels(dyerotor, -0.6, turret, -0.6));
-
+        .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+/*
+        driver
+        .a()
+        .whileTrue(
+            intake
+            .spinBlocker(0.1))
+            .onFalse(new InstantCommand(() -> intake.stopAll()) );
+*/
+/*
+        driver
+        .a()
+        .whileTrue(
+            intake
+            .extendIntake())
+            .onFalse(new InstantCommand(() -> intake.stopAll()) );
+*/
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
@@ -118,7 +132,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));

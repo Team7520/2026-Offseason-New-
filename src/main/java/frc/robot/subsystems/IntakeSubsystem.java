@@ -109,7 +109,11 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotorLeft.setControl(duty.withOutput(0));
         intakeMotorRight.setControl(duty.withOutput(0));
     }
-
+/*
+    public void shotBlocker(double speed) {
+        blockerMotor.setControl(duty.withOutput(speed));
+    }
+*/
     // EXTEND/RETRACT functions
 
     public void extendSpin(double speed) {
@@ -170,7 +174,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     // OTHER functions
-
+/*
+    public Command spinBlocker(double speed) {
+        return Commands.run(() -> shotBlocker(speed), this);
+    }
+*/
     public void stopAll() {
         intakeMotorLeft.setControl(duty.withOutput(0));
         intakeMotorRight.setControl(duty.withOutput(0));
