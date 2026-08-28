@@ -82,53 +82,44 @@ public class RobotContainer {
         driver.rightTrigger().whileTrue(
             turret.shoot(0.6)
         ).onFalse(
-            new InstantCommand(() -> turret.stopAll()) 
+            new InstantCommand(() -> turret.stopAll(), turret) 
         );
 
-        driver.leftTrigger().whileTrue(
-            turret.turnHood(0.1)
-        ).onFalse(
-            new InstantCommand(() -> turret.stopAll()) 
+        driver.leftTrigger().onTrue(
+            new InstantCommand(() -> turret.setHoodAngle(35), turret)
         );
 
         driver.rightBumper().whileTrue(
-            dyerotor.intakeDyeAndWheel(0.5, -0.6)
+            dyerotor.intakeDyeAndWheel(0.5, 0.6)
         ).onFalse(
             new InstantCommand(() -> dyerotor.stopAll()) 
         );
 
-        driver.leftBumper().whileTrue(
+        driver.a().whileTrue(
             turret.turnHood(-0.1)
         ).onFalse(
-            new InstantCommand(() -> turret.stopAll())
+            new InstantCommand(turret::stopAll)
         );
 
-        driver.a().whileTrue(
-            intake.blockerManual(0.05)
-        ).onFalse(
-            intake.blockerManual(0.0)
-        );
-
-        driver.b().whileTrue(
-            intake.blockerManual(-0.05)
-        ).onFalse(
-            intake.blockerManual(0.0)
-        );
+        driver.leftBumper().onTrue(
+            intake.blockerToggle()
+        ).onFalse(new InstantCommand(turret::stopAll));
 
         driver.x().whileTrue(
-            Commands.run(() -> intake.manualExtend(0.05))
+            Commands.run(() -> intake.manualExtend(0.5))
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
 
         driver.y().whileTrue(
-            Commands.run(() -> intake.manualExtend(-0.05))
+            Commands.run(() -> intake.manualExtend(-0.90))
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
 
-        driver
-        .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+
+        // driver
+        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
 /*
         driver
         .a()
@@ -137,7 +128,7 @@ public class RobotContainer {
             .spinBlocker(0.1))
             .onFalse(new InstantCommand(() -> intake.stopAll()) );
 */
-/*
+
         driver
         .a()
         .whileTrue(
@@ -146,7 +137,14 @@ public class RobotContainer {
             .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
         driver
-        .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+        .b()
+        .whileTrue(
+            turret
+            .turnHood(0.1))
+            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+
+        // driver
+        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
 /*
         driver
         .a()
@@ -170,10 +168,10 @@ public class RobotContainer {
         //     drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         // );
 
-        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+        // joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        // ));
 
         // // Run SysId routines when holding back/start and X/Y.
         // // Note that each routine should be run exactly once in a single log.

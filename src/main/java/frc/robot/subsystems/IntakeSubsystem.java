@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import java.io.Console;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
@@ -24,6 +30,8 @@ public class IntakeSubsystem extends SubsystemBase {
     double extendedPosition = -16.5; // placeholder value
     double retractedPosition = -5; // placeholder value
     private final double CURRENT_THRESHOLD = -20; // placeholder value
+    private final PositionVoltage positionRequest = new PositionVoltage(0);
+    boolean current = false;
 
     public IntakeSubsystem() {
         intakeMotorLeft = new TalonFX(IntakeConstants.INTAKE_MOTOR_LEFT_ID);
@@ -32,7 +40,7 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor = new TalonFX(IntakeConstants.BLOCKER_MOTOR_ID); // Placeholder IDs
         
         TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
-        intakeConfig.Slot0.kP = 0; // placeholder value
+        intakeConfig.Slot0.kP = 1; // placeholder value
         intakeConfig.Slot0.kI = 0; // placeholder value
         intakeConfig.Slot0.kD = 0; // placeholder value
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -46,19 +54,19 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotorRight.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration extendConfig = new TalonFXConfiguration();
-        extendConfig.Slot0.kP = 0; // placeholder value
+        extendConfig.Slot0.kP = 1; // placeholder value
         extendConfig.Slot0.kI = 0; // placeholder value
         extendConfig.Slot0.kD = 0; // placeholder value
         extendConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        //extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
         extendConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        extendConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
+        //extendConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
         extendMotor.getConfigurator().apply(extendConfig);
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration blockerConfig = new TalonFXConfiguration();
-        blockerConfig.Slot0.kP = 0; // placeholder value
+        blockerConfig.Slot0.kP = 3; // placeholder value
         blockerConfig.Slot0.kI = 0; // placeholder value
         blockerConfig.Slot0.kD = 0; // placeholder value
         blockerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -68,16 +76,29 @@ public class IntakeSubsystem extends SubsystemBase {
 
         blockerMotor.getConfigurator().apply(blockerConfig);
         blockerMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        blockerMotor.setPosition(0);
+        extendMotor.setPosition(0);
     }
 
     // BLOCKER functions
 
+    public void setBlocker() {
+        if (current == false) {
+            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
+            current = true;
+        } else {
+            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
+            current = false;
+        }
+    }
+
     public void extendBlocker() {
-        blockerMotor.setControl(pos.withPosition(IntakeConstants.BLOCKER_EXTEND));
+        blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
     }
 
     public void retractBlocker() {
-        blockerMotor.setControl(pos.withPosition(IntakeConstants.BLOCKER_RETRACT));
+        blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
     }
 
     public boolean blockerAtTarget(double position) {
@@ -91,11 +112,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command blockerToggle() {
-        if (blockerAtTarget(IntakeConstants.BLOCKER_RETRACT)) { // Extending
-            return new SequentialCommandGroup(retractIntake(), Commands.run(() -> extendBlocker(), this));
-        } else { // Retracting
-            return Commands.run(() -> retractBlocker(), this);
-        }
+        return new InstantCommand(() -> setBlocker(), this);
     }
 
     // INTAKE functions
@@ -117,6 +134,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // EXTEND/RETRACT functions
 
     public void manualExtend(double speed) {
+        SmartDashboard.putNumber("Intake", extendMotor.getPosition().getValueAsDouble());
         extendMotor.setControl(duty.withOutput(speed));
     }
 
@@ -191,5 +209,6 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber(
             "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
+        
     }
 }

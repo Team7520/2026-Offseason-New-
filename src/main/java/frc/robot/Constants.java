@@ -14,7 +14,7 @@ public class Constants {
         public static final double INTAKE_EXTEND = 1.0;
         public static final double INTAKE_RETRACT = 0.0;
 
-        public static final double BLOCKER_EXTEND = 0.25;
+        public static final double BLOCKER_EXTEND = -1.3;
         public static final double BLOCKER_RETRACT = 0;
     }
 
@@ -34,6 +34,13 @@ public class Constants {
         public static final double AZIMUTH_UPPER_LIMIT = 1.0;
 
         public static final double TURRET_SPEED = 8.0; // m/s
+
+        public static final double HOOD_MIN_ANGLE = 10;
+        public static final double HOOD_MAX_ANGLE = 45;
+        public static final double HOOD_MIN_ROTATION = 0;
+        public static final double HOOD_MAX_ROTATION = 2;
+        public static final double HOOD_ANGLE_RANGE = HOOD_MAX_ANGLE-HOOD_MIN_ANGLE;
+        public static final double HOOD_ROTATION_RANGE = HOOD_MAX_ROTATION-HOOD_MIN_ROTATION;
 
     }
 
