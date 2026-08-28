@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+
 public class Constants {
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_LEFT_ID = 0;
@@ -29,5 +33,39 @@ public class Constants {
         public static final double AZIMUTH_GEAR_RATIO = 53.2;
         public static final double AZIMUTH_LOWER_LIMIT = -1.0;
         public static final double AZIMUTH_UPPER_LIMIT = 1.0;
+
+        public static final double TURRET_SPEED = 8.0; // m/s
+
+    }
+
+    public static class UniverseConstants {
+        public static double hubHeight = 1.82; // m
+
+        public static double redHubX = Units.inchesToMeters(651.22 - 182.11);
+        public static double redHubY = Units.inchesToMeters(158.84);
+        public static double blueHubX = Units.inchesToMeters(182.11);
+        public static double blueHubY = Units.inchesToMeters(158.84);
+
+        public static Pose3d blueGoalPose = new Pose3d(blueHubX, blueHubY, hubHeight, new Rotation3d());
+
+        public static Pose3d redGoalPose = new Pose3d(redHubX, redHubY, hubHeight, new Rotation3d());
+
+        public static double fieldLength = Units.inchesToMeters(651.22);
+        public static double fieldWidth = Units.inchesToMeters(317.69);
+        public static double blueDepotFeedX = 2.5;
+        public static double blueDepotFeedY = 6;
+
+        public static double redOutpostFeedX = fieldLength - blueDepotFeedX;
+        public static double redOutpostFeedY = blueDepotFeedY;
+
+        public static double blueOutpostFeedX = blueDepotFeedX;
+        public static double blueOutpostFeedY = fieldWidth - blueDepotFeedY;
+        public static double redDepotFeedX = fieldLength - blueOutpostFeedX;
+        public static double redDepotFeedY = blueOutpostFeedY;
+
+        public static double fieldWidthMidpoint = fieldWidth / 2;
+        public static double fieldLengthMidpoint = fieldLength / 2;
+
+        public static double g = 9.81;
     }
 }

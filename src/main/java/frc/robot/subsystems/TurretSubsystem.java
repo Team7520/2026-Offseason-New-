@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -101,12 +102,13 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setAzimuth(double angle) {
-        double rotations = angle / 360.0;
+        Rotation2d normalized = Rotation2d.fromDegrees(angle);
+        double rotations = normalized.getRotations();
         double curRotations = getAzimuth();
 
         double[] options = {rotations, rotations + 1, rotations - 1};
-        double best = 1000.0;
-        double bestChoice = -1;
+        double best = Double.POSITIVE_INFINITY;
+        double bestChoice = curRotations;
         for (double d : options) {
             if (d > TurretConstants.AZIMUTH_LOWER_LIMIT && d < TurretConstants.AZIMUTH_UPPER_LIMIT && Math.abs(d - curRotations) < best) {
                 best = Math.abs(d - curRotations);
