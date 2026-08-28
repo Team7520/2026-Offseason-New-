@@ -11,55 +11,50 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DyeConstants;
 
 public class DyerotorSubsystem extends SubsystemBase {
-    private final TalonFX wheelMotor;
     private final TalonFX rotateMotor;
+    private final TalonFX wheelMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
 
     public DyerotorSubsystem() {
-        wheelMotor = new TalonFX(DyeConstants.DYE_WHEEL_MOTOR_ID);
         rotateMotor = new TalonFX(DyeConstants.DYE_ROTATE_MOTOR_ID);
+        wheelMotor = new TalonFX(DyeConstants.DYE_WHEEL_MOTOR_ID);
         
-        
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Slot0.kP = 1;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 60;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
+        TalonFXConfiguration rotateConfig = new TalonFXConfiguration();
+        rotateConfig.Slot0.kP = 1;
+        rotateConfig.Slot0.kI = 0;
+        rotateConfig.Slot0.kD = 0; // placeholder values
+        rotateConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        rotateConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        rotateConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        rotateConfig.CurrentLimits.StatorCurrentLimit = 60; // placeholder values
 
-        wheelMotor.getConfigurator().apply(config);
-        wheelMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
-
-        config.Slot0.kP = 1;
-        config.Slot0.kI = 0;
-        config.Slot0.kD = 0; // placeholder values
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 60;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 60; // placeholder values
-
-        rotateMotor.getConfigurator().apply(config);
+        rotateMotor.getConfigurator().apply(rotateConfig);
         rotateMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
-    }
 
-    public void spinWheel(double speed) {
-        wheelMotor.setControl(duty.withOutput(speed));
-    }
+        TalonFXConfiguration wheelConfig = new TalonFXConfiguration();
+        wheelConfig.Slot0.kP = 1;
+        wheelConfig.Slot0.kI = 0;
+        wheelConfig.Slot0.kD = 0; // placeholder values
+        wheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        wheelConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        wheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        wheelConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
 
+        wheelMotor.getConfigurator().apply(wheelConfig);
+        wheelMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
+    }
+ 
     public void spinDye(double speed) {
         rotateMotor.setControl(duty.withOutput(speed));
     }
 
-    public void stopAll() {
-        wheelMotor.setControl(duty.withOutput(0));
-        rotateMotor.setControl(duty.withOutput(0));
+    public void spinWheel(double speed) {
+        wheelMotor.setControl(duty.withOutput(-speed));
     }
 
     public void spinDyeAndWheel(double speed1, double speed2) {
         rotateMotor.setControl(duty.withOutput(speed1));
-        wheelMotor.setControl(duty.withOutput(speed2));
+        wheelMotor.setControl(duty.withOutput(-speed2));
     }
 
     public Command intakeDyeAndWheel(double speed1, double speed2) {
@@ -67,6 +62,15 @@ public class DyerotorSubsystem extends SubsystemBase {
     }
 
     public Command reverseDye(double speed) {
-        return Commands.run(() -> spinDye(speed), this);
+        return Commands.run(() -> spinDye(-speed), this);
+    }
+
+    public Command reverseWheel(double speed) {
+        return Commands.run(() -> spinWheel(-speed), this);
+    }
+
+    public void stopAll() {
+        rotateMotor.setControl(duty.withOutput(0));
+        wheelMotor.setControl(duty.withOutput(0));
     }
 }

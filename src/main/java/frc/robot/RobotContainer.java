@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+import frc.robot.commands.ReverseWheels;
+
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
@@ -34,7 +36,6 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
-    private final CommandXboxController operator = new CommandXboxController(1);
 
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -126,6 +127,42 @@ public class RobotContainer {
             new InstantCommand(() -> intake.stopAll())
         );
 
+        driver
+        .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+/*
+        driver
+        .a()
+        .whileTrue(
+            intake
+            .spinBlocker(0.1))
+            .onFalse(new InstantCommand(() -> intake.stopAll()) );
+*/
+/*
+        driver
+        .a()
+        .whileTrue(
+            turret
+            .turnHood(-0.1))
+            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+
+        driver
+        .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+/*
+        driver
+        .a()
+        .whileTrue(
+            intake
+            .spinBlocker(0.1))
+            .onFalse(new InstantCommand(() -> intake.stopAll()) );
+*/
+/*
+        driver
+        .a()
+        .whileTrue(
+            intake
+            .extendIntake())
+            .onFalse(new InstantCommand(() -> intake.stopAll()) );
+*/
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         // final var idle = new SwerveRequest.Idle();
@@ -133,10 +170,10 @@ public class RobotContainer {
         //     drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         // );
 
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
+        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        ));
 
         // // Run SysId routines when holding back/start and X/Y.
         // // Note that each routine should be run exactly once in a single log.
