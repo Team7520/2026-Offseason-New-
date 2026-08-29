@@ -66,7 +66,7 @@ public class IntakeSubsystem extends SubsystemBase {
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration blockerConfig = new TalonFXConfiguration();
-        blockerConfig.Slot0.kP = 3; // placeholder value
+        blockerConfig.Slot0.kP = 10; // placeholder value
         blockerConfig.Slot0.kI = 0; // placeholder value
         blockerConfig.Slot0.kD = 0; // placeholder value
         blockerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -189,6 +189,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command slowRetract() {
         return Commands.runOnce(() -> retractWithSpeed(0.05), this);
+    }
+
+    public Command spinRoller(double speed) {
+        return Commands.run(() -> runIntake(speed), this);
     }
 
     // OTHER functions
