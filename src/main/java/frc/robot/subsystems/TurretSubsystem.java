@@ -114,7 +114,7 @@ public class TurretSubsystem extends SubsystemBase {
         double normalized = (angle - TurretConstants.HOOD_MIN_ANGLE) / TurretConstants.HOOD_ANGLE_RANGE;
         double toRotations = TurretConstants.HOOD_MIN_ROTATION + normalized * TurretConstants.HOOD_ROTATION_RANGE;
 
-        hoodMotor.setControl(positionRequest.withPosition(angle));
+        hoodMotor.setControl(positionRequest.withPosition(toRotations));
         System.out.println("running");
 
     }

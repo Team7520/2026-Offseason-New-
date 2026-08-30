@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.commands.ReverseWheels;
+import frc.robot.commands.ShootAndIndex;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -78,11 +79,9 @@ public class RobotContainer {
             // dyerotor.reverseDye(-0.1)
         // );
 
-        // Testing the shooter
+        // Testing
         driver.rightTrigger().whileTrue(
-            turret.shoot(0.6)
-        ).onFalse(
-            new InstantCommand(() -> turret.stopAll(), turret) 
+            new ShootAndIndex(dyerotor, turret)
         );
 
         driver.leftTrigger().onTrue(
@@ -90,9 +89,9 @@ public class RobotContainer {
         );
 
         driver.rightBumper().whileTrue(
-            dyerotor.intakeDyeAndWheel(0.5, 0.6)
+            intake.spinRoller(-0.9)
         ).onFalse(
-            new InstantCommand(() -> dyerotor.stopAll()) 
+            new InstantCommand(() -> intake.stopAll()) 
         );
 
         driver.a().whileTrue(
@@ -112,11 +111,17 @@ public class RobotContainer {
         );
 
         driver.y().whileTrue(
-            Commands.run(() -> intake.manualExtend(-0.90))
+            intake.spinRoller(0.9))
+        .onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
+/*
+        driver.y().whileTrue(
+            Commands.run(() -> intake.manualExtend(-0.9))
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
-
+*/
 
         // driver
         // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
@@ -128,13 +133,6 @@ public class RobotContainer {
             .spinBlocker(0.1))
             .onFalse(new InstantCommand(() -> intake.stopAll()) );
 */
-
-        driver
-        .a()
-        .whileTrue(
-            turret
-            .turnHood(-0.1))
-            .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
         driver
         .b()
@@ -143,45 +141,12 @@ public class RobotContainer {
             .turnHood(0.1))
             .onFalse(new InstantCommand(() -> turret.stopAll()) );
 
+// Final y command: reverse shooter and dye wheels
         // driver
         // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
-/*
-        driver
-        .a()
-        .whileTrue(
-            intake
-            .spinBlocker(0.1))
-            .onFalse(new InstantCommand(() -> intake.stopAll()) );
-*/
-/*
-        driver
-        .a()
-        .whileTrue(
-            intake
-            .extendIntake())
-            .onFalse(new InstantCommand(() -> intake.stopAll()) );
-*/
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode is applied to the drive motors while disabled.
-        // final var idle = new SwerveRequest.Idle();
-        // RobotModeTriggers.disabled().whileTrue(
-        //     drivetrain.applyRequest(() -> idle).ignoringDisable(true)
-        // );
 
-        // joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        // joystick.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        // ));
-
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        // // Reset the field-centric heading on left bumper press.
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+// Final x command: x-cross wheels
+        // drive.x().whileTrue(drivetrain.applyRequest(() -> brake));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
