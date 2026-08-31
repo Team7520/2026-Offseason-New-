@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -21,6 +25,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX topMotorRight;
     private final TalonFX hoodMotor;
     private final TalonFX azimuthMotor;
+    private final CANcoder encoder;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionVoltage positionRequest = new PositionVoltage(0);
 
@@ -29,6 +34,7 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorRight = new TalonFX(TurretConstants.TOP_MOTOR_ID_RIGHT);
         hoodMotor = new TalonFX(TurretConstants.HOOD_MOTOR_ID);
         azimuthMotor = new TalonFX(TurretConstants.AZIMUTH_MOTOR_ID);
+        encoder = new CANcoder(55);
 
         TalonFXConfiguration topConfig = new TalonFXConfiguration();
         topConfig.Slot0.kP = 0;
@@ -44,20 +50,38 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorRight.getConfigurator().apply(topConfig);
         topMotorRight.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
+        // Configure CANcoder
+        CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
+        cc_cfg.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        cc_cfg.MagnetSensor.MagnetOffset = 0.08; // Adjust this value based on your magnet alignment
+        encoder.getConfigurator().apply(cc_cfg);
+
         TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-        azimuthConfig.Slot0.kP = 0;
+        azimuthConfig.Slot0.kP = 100;
         azimuthConfig.Slot0.kI = 0;
         azimuthConfig.Slot0.kD = 0; // placeholder values
+
+        azimuthConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        azimuthConfig.Feedback.FeedbackRemoteSensorID = encoder.getDeviceID();
+        azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
+
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         azimuthConfig.CurrentLimits.StatorCurrentLimit = 60;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         azimuthConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
+        SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
+        azimuthLimits.ForwardSoftLimitEnable = true;
+        azimuthLimits.ForwardSoftLimitThreshold = 0.75;
+        azimuthLimits.ReverseSoftLimitEnable = true;
+        azimuthLimits.ReverseSoftLimitThreshold = -0.75;
+
+        azimuthConfig.SoftwareLimitSwitch = azimuthLimits;
         azimuthMotor.getConfigurator().apply(azimuthConfig);
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
         TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
-        hoodConfig.Slot0.kP = 1;
+        hoodConfig.Slot0.kP = 2;
         hoodConfig.Slot0.kI = 0;
         hoodConfig.Slot0.kD = 0; // placeholder values
         hoodConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -65,13 +89,13 @@ public class TurretSubsystem extends SubsystemBase {
         hoodConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         hoodConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
 
-        SoftwareLimitSwitchConfigs limits = new SoftwareLimitSwitchConfigs();
-        limits.ForwardSoftLimitEnable = true;
-        limits.ForwardSoftLimitThreshold = 3;
-        limits.ReverseSoftLimitEnable = true;
-        limits.ReverseSoftLimitThreshold = 0; 
+        SoftwareLimitSwitchConfigs hoodLimits = new SoftwareLimitSwitchConfigs();
+        hoodLimits.ForwardSoftLimitEnable = true;
+        hoodLimits.ForwardSoftLimitThreshold = 3;
+        hoodLimits.ReverseSoftLimitEnable = true;
+        hoodLimits.ReverseSoftLimitThreshold = 0; 
 
-        hoodConfig.SoftwareLimitSwitch = limits;
+        hoodConfig.SoftwareLimitSwitch = hoodLimits;
 
         hoodMotor.setPosition(0);
 
@@ -84,7 +108,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public double getAzimuth() {
-        return azimuthMotor.getPosition().getValueAsDouble() / TurretConstants.AZIMUTH_GEAR_RATIO;
+        return encoder.getPosition().getValueAsDouble();
     }
 
     public void setAzimuth(double angle) {
@@ -141,6 +165,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-         System.out.println(hoodMotor.getPosition().getValueAsDouble());
+        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
     }
 }

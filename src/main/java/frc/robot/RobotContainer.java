@@ -98,22 +98,23 @@ public class RobotContainer {
         ).onFalse(
             new InstantCommand(turret::stopAll)
         );
-
+/*
         driver.leftBumper().onTrue(
             intake.blockerToggle()
         ).onFalse(new InstantCommand(turret::stopAll));
-
-        driver.x().whileTrue(
+*/
+        driver.leftBumper().whileTrue(
             Commands.run(() -> intake.manualExtend(0.5))
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
-
+/*
         driver.y().whileTrue(
             intake.spinRoller(0.9))
         .onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
+*/
 /*
         driver.y().whileTrue(
             Commands.run(() -> intake.manualExtend(-0.9))
@@ -122,23 +123,20 @@ public class RobotContainer {
         );
 */
 
-        // driver
-        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
-/*
-        driver
-        .a()
-        .whileTrue(
-            intake
-            .spinBlocker(0.1))
-            .onFalse(new InstantCommand(() -> intake.stopAll()) );
-*/
+        driver.x().whileTrue(
+            new InstantCommand(() -> turret.turn(0.2)))
+        .onFalse(new InstantCommand(() -> turret.stopAll())
+        );
 
-        driver
-        .b()
-        .whileTrue(
-            turret
-            .turnHood(0.1))
-            .onFalse(new InstantCommand(() -> turret.stopAll()) );
+        driver.y().whileTrue(
+            new InstantCommand(() -> turret.turn(-0.2)))
+        .onFalse(new InstantCommand(() -> turret.stopAll())
+        );        
+
+        driver.b().whileTrue(
+            turret.turnHood(0.1))
+        .onFalse(new InstantCommand(() -> turret.stopAll())
+        );
 
 // Final y command: reverse shooter and dye wheels
         // driver

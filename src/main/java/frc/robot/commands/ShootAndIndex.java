@@ -25,6 +25,7 @@ public class ShootAndIndex extends Command {
   @Override
   public void execute() {
     turret.setHoodAngle(35);
+    turret.setAzimuth(0);
     turret.spinFlywheels(0.6);
     if (timer.hasElapsed(0.3)) {
       dyerotor.spinDyeAndWheel(0.65, 0.6);
