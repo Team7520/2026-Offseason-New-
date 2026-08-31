@@ -75,11 +75,10 @@ public class RobotContainer {
             )
         );
 
-        // dyerotor.setDefaultCommand(
-            // dyerotor.reverseDye(-0.1)
-        // );
+        dyerotor.setDefaultCommand (
+            dyerotor.intakeDyeAndWheel(-0.1, 0)
+        );
 
-        // Testing
         driver.rightTrigger().whileTrue(
             new ShootAndIndex(dyerotor, turret)
         );
