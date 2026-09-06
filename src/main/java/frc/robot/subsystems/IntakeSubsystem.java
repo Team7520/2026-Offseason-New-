@@ -66,7 +66,7 @@ public class IntakeSubsystem extends SubsystemBase {
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration blockerConfig = new TalonFXConfiguration();
-        blockerConfig.Slot0.kP = 10; // placeholder value
+        blockerConfig.Slot0.kP = 5; // placeholder value
         blockerConfig.Slot0.kI = 0; // placeholder value
         blockerConfig.Slot0.kD = 0; // placeholder value
         blockerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

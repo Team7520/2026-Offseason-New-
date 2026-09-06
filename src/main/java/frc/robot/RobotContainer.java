@@ -38,7 +38,7 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
 
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -74,11 +74,11 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-
+/*
         dyerotor.setDefaultCommand (
             dyerotor.intakeDyeAndWheel(-0.1, 0)
         );
-
+*/
         driver.rightTrigger().whileTrue(
             new ShootAndIndex(dyerotor, turret)
         );
@@ -138,6 +138,21 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );
 
+        driver.povLeft().onTrue(
+            intake.blockerToggle()
+        ).onFalse(new InstantCommand(turret::stopAll));
+
+        driver.povRight().whileTrue(
+            Commands.run(() -> intake.manualExtend(-0.9))
+        ).onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
+
+        driver.povUp().whileTrue(
+            intake.spinRoller(0.9))
+        .onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
 // Final y command: reverse shooter and dye wheels
         // driver
         // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
