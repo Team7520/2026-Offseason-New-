@@ -24,7 +24,7 @@ import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
 
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.TurretSubsystem; 
 import frc.robot.subsystems.DyerotorSubsystem; 
 import frc.robot.subsystems.IntakeSubsystem; 
@@ -52,7 +52,7 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Drive drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
         turret = new TurretSubsystem();
@@ -155,7 +155,7 @@ public class RobotContainer {
         );
 // Final y command: reverse shooter and dye wheels
         // driver
-        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+        // .y().whileTrue(new ReverseWheels(dyerotor, -0.6, turret, -0.6));
 
 // Final x command: x-cross wheels
         // drive.x().whileTrue(drivetrain.applyRequest(() -> brake));
