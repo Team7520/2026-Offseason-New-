@@ -11,10 +11,10 @@ public class Constants {
         public static final int EXTEND_MOTOR_ID = 3;
         public static final int BLOCKER_MOTOR_ID = 4;
 
-        public static final double INTAKE_EXTEND = 1.0;
+        public static final double INTAKE_EXTEND = -7.5;
         public static final double INTAKE_RETRACT = 0.0;
 
-        public static final double BLOCKER_EXTEND = -1.3;
+        public static final double BLOCKER_EXTEND = -22;
         public static final double BLOCKER_RETRACT = 0;
     }
 

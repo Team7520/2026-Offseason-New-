@@ -27,8 +27,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX blockerMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionDutyCycle pos = new PositionDutyCycle(0);
-    double extendedPosition = -16.5; // placeholder value
-    double retractedPosition = -5; // placeholder value
     private final double CURRENT_THRESHOLD = -20; // placeholder value
     private final PositionVoltage positionRequest = new PositionVoltage(0);
     boolean current = false;
@@ -54,13 +52,13 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotorRight.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration extendConfig = new TalonFXConfiguration();
-        extendConfig.Slot0.kP = 1; // placeholder value
+        extendConfig.Slot0.kP = 5; // placeholder value
         extendConfig.Slot0.kI = 0; // placeholder value
         extendConfig.Slot0.kD = 0; // placeholder value
         extendConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        //extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
         extendConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        //extendConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
+        extendConfig.CurrentLimits.StatorCurrentLimit = 150; // placeholder value
 
         extendMotor.getConfigurator().apply(extendConfig);
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -143,7 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void retractWithSpeed(double speed) {
-        extendMotor.setControl(pos.withPosition(retractedPosition).withVelocity(speed)); // placeholder value
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withVelocity(speed));
         stopIntake();
     }
 
@@ -162,11 +160,11 @@ public class IntakeSubsystem extends SubsystemBase {
         // System.out.print(error);
         return error < 0.1;
     }
-
+/*
     public double getExtendedPosition() {
-        return extendedPosition;
+        return IntakeConstants.INTAKE_EXTEND;
     }
-
+*/
     public void setCoast() {
         extendMotor.setControl(new CoastOut());
     }
@@ -179,12 +177,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command extendIntake() {
-        return Commands.run(() -> extend(), this).until(() -> atTarget(extendedPosition));
+        return Commands.run(() -> extend(), this).until(() -> atTarget(IntakeConstants.INTAKE_EXTEND));
         // .finallyDo(() -> setNeutral());
     }
 
     public Command retractIntake() {
-        return Commands.runOnce(() -> retract(), this);
+        return Commands.run(() -> retract(), this).until(() -> atTarget(IntakeConstants.INTAKE_RETRACT));
     }
 
     public Command slowRetract() {
@@ -210,6 +208,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
+        System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber(
             "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());

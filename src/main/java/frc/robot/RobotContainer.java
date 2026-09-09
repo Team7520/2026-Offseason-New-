@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
+import frc.robot.commands.ExtendAndRunIntake;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
 
@@ -83,8 +85,8 @@ public class RobotContainer {
             new ShootAndIndex(dyerotor, turret)
         );
 
-        driver.leftTrigger().onTrue(
-            new InstantCommand(() -> turret.setHoodAngle(35), turret)
+        driver.leftTrigger().whileTrue(
+            new ExtendAndRunIntake(intake, 0.9)
         );
 
         driver.rightBumper().whileTrue(
@@ -93,35 +95,11 @@ public class RobotContainer {
             new InstantCommand(() -> intake.stopAll()) 
         );
 
-        driver.a().whileTrue(
-            turret.turnHood(-0.1)
-        ).onFalse(
-            new InstantCommand(turret::stopAll)
-        );
-/*
-        driver.leftBumper().onTrue(
-            intake.blockerToggle()
-        ).onFalse(new InstantCommand(turret::stopAll));
-*/
         driver.leftBumper().whileTrue(
-            Commands.run(() -> intake.manualExtend(0.5))
+            new RetractIntake(intake, 0.9)
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
-/*
-        driver.y().whileTrue(
-            intake.spinRoller(0.9))
-        .onFalse(
-            new InstantCommand(() -> intake.stopAll())
-        );
-*/
-/*
-        driver.y().whileTrue(
-            Commands.run(() -> intake.manualExtend(-0.9))
-        ).onFalse(
-            new InstantCommand(() -> intake.stopAll())
-        );
-*/
 
         driver.x().whileTrue(
             new InstantCommand(() -> turret.turn(0.2)))
@@ -133,32 +111,49 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );        
 
+        driver.a().whileTrue(
+            turret.turnHood(-0.1)
+        ).onFalse(
+            new InstantCommand(turret::stopAll)
+        );
+
         driver.b().whileTrue(
             turret.turnHood(0.1))
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );
 
-        driver.povLeft().onTrue(
+        driver.povUp().onTrue(
             intake.blockerToggle()
         ).onFalse(new InstantCommand(turret::stopAll));
 
-        driver.povRight().whileTrue(
-            Commands.run(() -> intake.manualExtend(-0.9))
-        ).onFalse(
-            new InstantCommand(() -> intake.stopAll())
-        );
-
-        driver.povUp().whileTrue(
+        driver.povDown().whileTrue(
             intake.spinRoller(0.9))
         .onFalse(
             new InstantCommand(() -> intake.stopAll())
         );
-// Final y command: reverse shooter and dye wheels
-        // driver
-        // .y().whileTrue(new ReverseWheels(dyerotor, -0.6, turret, -0.6));
+
+        driver.povLeft().whileTrue(
+            intake.extendIntake()
+        ).onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
+
+        driver.povRight().whileTrue(
+            intake.retractIntake()
+        ).onFalse(
+            new InstantCommand(() -> intake.stopAll())
+        );
+
 
 // Final x command: x-cross wheels
-        // drive.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // drive.x().whileTrue(
+        // drivetrain.applyRequest(() -> brake)
+        // );
+
+// Final y command: reverse shooter and dye wheels
+        // driver.y().whileTrue(
+        // new ReverseWheels(dyerotor, -0.9, turret, -0.6)
+        // );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
