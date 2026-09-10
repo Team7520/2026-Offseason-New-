@@ -26,6 +26,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
@@ -34,6 +38,46 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    private final PIDController m_pathXController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController m_pathYController = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController m_pathThetaController = new PIDController(7.5, 0.0, 0.0);
+
+    private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds =
+        new SwerveRequest.ApplyFieldSpeeds();
+
+    private Rotation2d m_autoHeading = Rotation2d.kZero;
+
+    {
+        m_pathThetaController.enableContinuousInput(-Math.PI, Math.PI);
+    }
+
+    /**
+     * Resets autonomous odometry and captures the trajectory's initial heading.
+     * Autonomous paths hold this heading so translation waypoints cannot make the
+     * chassis spin; the turret remains responsible for aiming.
+     */
+    public void resetPoseForAuto(Pose2d pose) {
+        resetPose(pose);
+        m_autoHeading = pose.getRotation();
+        m_pathXController.reset();
+        m_pathYController.reset();
+        m_pathThetaController.reset();
+    }
+
+    public void followPath(SwerveSample sample) {
+        Pose2d pose = getState().Pose;
+
+        ChassisSpeeds targetSpeeds = new ChassisSpeeds(
+            sample.vx + m_pathXController.calculate(pose.getX(), sample.x),
+            sample.vy + m_pathYController.calculate(pose.getY(), sample.y),
+            m_pathThetaController.calculate(
+                pose.getRotation().getRadians(),
+                m_autoHeading.getRadians()
+            )
+        );
+
+        setControl(m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds));
+    }
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
