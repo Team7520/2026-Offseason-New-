@@ -42,9 +42,9 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeConfig.Slot0.kI = 0; // placeholder value
         intakeConfig.Slot0.kD = 0; // placeholder value
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 70; // placeholder value
 
         intakeMotorLeft.getConfigurator().apply(intakeConfig);
         intakeMotorLeft.setNeutralMode(NeutralModeValue.Brake);

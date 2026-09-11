@@ -11,10 +11,14 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,6 +43,8 @@ public class TurretSubsystem extends SubsystemBase {
         UNDER_FAR_TRENCH,
         NO_ALLIANCE
     }
+
+    StructPublisher<Pose2d> turretPosePublisher = NetworkTableInstance.getDefault().getStructTopic("TurretPose", Pose2d.struct).publish();
 
     private final TalonFX topMotorLeft;
     private final TalonFX topMotorRight;
@@ -146,6 +152,76 @@ public class TurretSubsystem extends SubsystemBase {
         hoodMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
     }
 
+    public void setTurretAzimuth(Rotation2d targetAngle) {
+        double target = targetAngle.getRotations();
+        double clampedTarget = optimizeTurretPosition(target);
+        SmartDashboard.putNumber("Clamped Target", clampedTarget);
+        azimuthMotor.setControl(positionRequest.withPosition(clampedTarget));
+    }
+
+    private double optimizeTurretPosition(double targetPosition) {
+        double forwardLimit = 0.5;
+        double reverseLimit = -0.5;
+
+        if (getRobotZone() == RobotZone.SHOOTING) {
+            forwardLimit = TurretConstants.TURRET_FORWARD_LIMIT;
+            reverseLimit = TurretConstants.TURRET_REVERSE_LIMIT;
+        }
+
+        // Get current position
+        double currentPosition = azimuthMotor.getPosition().getValueAsDouble();
+
+        // Clamp target to the valid range [-0.5, 0.5]
+        double clampedTarget = MathUtil.clamp(targetPosition, -0.5, 0.5);
+
+        // Try the target position as-is and with ±1 rotation offset
+        double[] candidates = {clampedTarget, clampedTarget + 1.0, clampedTarget - 1.0};
+
+        // Find the candidate that is within bounds and requires shortest distance
+        double bestPosition = clampedTarget;
+        double shortestDistance = Double.MAX_VALUE;
+
+        for (double candidate : candidates) {
+            // Check if within dynamic limits
+            if (candidate >= reverseLimit && candidate <= forwardLimit) {
+                // Calculate distance from current position
+                double distance = Math.abs(candidate - currentPosition);
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    bestPosition = candidate;
+                }
+            }
+        }
+
+    return bestPosition;
+    }
+
+    /*
+    * @param robotPose
+    * @param goalPose
+    * @return an Rotation2D from −180°, 180°
+    */
+    public Rotation2d calculateTurretAzimuth(Pose2d robotPose, Pose2d goalPose) {
+        Transform2d robotToTurret = new Transform2d(new Translation2d(), new Rotation2d()); // 5.5 inches
+        Pose2d turretPose = robotPose.transformBy(robotToTurret);
+        Translation2d turretToGoal = goalPose.getTranslation().minus(turretPose.getTranslation());
+        Rotation2d fieldAngle = turretToGoal.getAngle();
+        turretPosePublisher.set(turretPose);
+
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(Math.PI / 2)); // Adjust for turret 90 degree offset angle
+    }
+/*
+    public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {
+        ChassisSpeeds currentSpeed = drive.getFieldRelativeSpeeds();
+        SmartDashboard.putNumber("Current Speed VX", currentSpeed.vxMetersPerSecond);
+        SmartDashboard.putNumber("Current Speed VY", currentSpeed.vyMetersPerSecond);
+        return new Pose2d(
+            robotPose.getX() + currentSpeed.vxMetersPerSecond * (odometryLatency + timeOfFlight),
+            robotPose.getY() + currentSpeed.vyMetersPerSecond * (timeOfFlight + odometryLatency),
+            robotPose.getRotation().plus(new Rotation2d(currentSpeed.omegaRadiansPerSecond * odometryLatency))
+        );
+    }
+*/
     public RobotZone getRobotZone() {
         if (!availableAlliance) {
             return RobotZone.NO_ALLIANCE;
