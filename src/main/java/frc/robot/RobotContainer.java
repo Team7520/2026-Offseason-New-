@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -70,15 +71,15 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
     }
-/*
-    public void setLocation(Optional<EstimatedRobotPose> visionEst) {
-        visionEst.ifPresent(est -> {
+
+    public void setLocation(List<EstimatedRobotPose> visionEsts) {
+        for (var est : visionEsts) {
             Pose2d pose = est.estimatedPose.toPose2d();
             drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
-        });
-        System.out.println(drivetrain.getPose());
+        }
+        // System.out.println(drivetrain.getPose());
     }
-*/
+
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -126,7 +127,7 @@ public class RobotContainer {
         );        
 
         
-        driver.a().whileTrue(new GoToAzimuth(drivetrain.getPose(), UniverseConstants.redGoalPose.toPose2d(), turret));
+        driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
 
         driver.povUp().onTrue(
             intake.blockerToggle()

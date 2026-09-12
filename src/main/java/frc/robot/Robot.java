@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
-        // m_robotContainer.setLocation(vision.getTargets());
+        m_robotContainer.setLocation(vision.getTargets());
 
         // StatusSignal<Angle> angle = absoluteEncoder.getAbsolutePosition().waitForUpdate(0.1);
 
