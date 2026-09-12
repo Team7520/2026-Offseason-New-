@@ -38,11 +38,11 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor = new TalonFX(IntakeConstants.BLOCKER_MOTOR_ID); // Placeholder IDs
         
         TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
-        intakeConfig.Slot0.kP = 1; // placeholder value
+        intakeConfig.Slot0.kP = 8; // placeholder value
         intakeConfig.Slot0.kI = 0; // placeholder value
         intakeConfig.Slot0.kD = 0; // placeholder value
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 60; // placeholder value
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         intakeConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
 
@@ -208,8 +208,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
-        System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
+        // System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
+        // System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber(
             "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
