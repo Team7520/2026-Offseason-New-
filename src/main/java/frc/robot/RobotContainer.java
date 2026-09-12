@@ -96,7 +96,7 @@ public class RobotContainer {
         );
 
         driver.leftBumper().whileTrue(
-            new RetractIntake(intake, 0.9)
+            new RetractIntake(intake, 0.3)
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
         );

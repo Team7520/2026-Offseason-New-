@@ -11,7 +11,7 @@ public class Constants {
         public static final int EXTEND_MOTOR_ID = 3;
         public static final int BLOCKER_MOTOR_ID = 4;
 
-        public static final double INTAKE_EXTEND = -6.75;
+        public static final double INTAKE_EXTEND = -6;
         public static final double INTAKE_RETRACT = 0.0;
 
         public static final double BLOCKER_EXTEND = -22;

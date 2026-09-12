@@ -137,16 +137,21 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void extend() {
-        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
+        if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
+            extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
+        }
+//        setBrakeMode();
     }
 
     public void retractWithSpeed(double speed) {
-        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withVelocity(speed));
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withVelocity(speed).withEnableFOC(true));
+//        setBrakeMode();
         stopIntake();
     }
 
     public void retract() {
-        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT));
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withEnableFOC(true));
+//        setBrakeMode();
         stopIntake();
     }
 
@@ -160,6 +165,16 @@ public class IntakeSubsystem extends SubsystemBase {
         // System.out.print(error);
         return error < 0.1;
     }
+/*
+    public void setBrakeMode() {
+        double position = extendMotor.getPosition().getValueAsDouble();
+        if (position > -1) {
+            extendMotor.setNeutralMode(NeutralModeValue.Brake);
+        } else {
+            extendMotor.setNeutralMode(NeutralModeValue.Coast);
+        }
+    }
+*/
 /*
     public double getExtendedPosition() {
         return IntakeConstants.INTAKE_EXTEND;
@@ -177,7 +192,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command extendIntake() {
-        return Commands.run(() -> extend(), this).until(() -> atTarget(IntakeConstants.INTAKE_EXTEND));
+        return Commands.run(() -> extend()).until(() -> atTarget(IntakeConstants.INTAKE_EXTEND));
         // .finallyDo(() -> setNeutral());
     }
 
@@ -206,13 +221,16 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor.setControl(duty.withOutput(0));
     }
 
+    public void stopExtend() {
+        extendMotor.setControl(duty.withOutput(0));
+    }
+
     @Override
     public void periodic() {
         System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
         System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber(
-            "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
         
     }
 }
