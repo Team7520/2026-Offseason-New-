@@ -2,8 +2,12 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -17,28 +21,27 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 
 public class Vision {
-    private List<PhotonPoseEstimator> estimators = null;
 
     AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     private final Transform3d robotToFrontLeft = new Transform3d(
-        new Translation3d(-0.3217183558, 0.1713393322, 0.5360775664), 
+        new Translation3d(-0.3217183558,0.1713393322,0.5360775664),
         new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(45))
     );
 
     private final Transform3d robotToFrontRight = new Transform3d(
-        new Translation3d(0.288096706, 0.2131367848, 0.5360775664), 
-        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(315))
+        new Translation3d(0.288096706, 0.2131367848, 0.5360775664),
+        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(45))
     );
 
     private final Transform3d robotToBackLeft = new Transform3d(
-        new Translation3d(0.2162596386, 0.2823385006, 0.5360775664), 
-        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(135))
+        new Translation3d(.2162596386, .2823385006, .5360775664),
+        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(45))
     );
 
     private final Transform3d robotToBackRight = new Transform3d(
-        new Translation3d(0.3452393654, 0.2823458412, 0.5360775664), 
-        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(225))
+        new Translation3d(.3452393654, .2823458412, .5360775664),
+        new Rotation3d(0, Units.degreesToRadians(-23), Units.degreesToRadians(45))
     );
 
     PhotonCamera frontLeft = new PhotonCamera("frontLeft");
@@ -72,17 +75,35 @@ public class Vision {
         robotToBackRight
     );
 
-    public List<PhotonTrackedTarget> getTargets(){
-        List<PhotonTrackedTarget> targets = new ArrayList<>();
-        for (PhotonCamera camera : cameras) {
-            PhotonPipelineResult result = camera.getLatestResult();
+    public Optional<EstimatedRobotPose> getTargets(){
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        for (var result : backRight.getAllUnreadResults()) {
+            visionEst = backRightEstimator.estimateCoprocMultiTagPose(result);
+            if (visionEst.isEmpty()) {
+                visionEst = backRightEstimator.estimateLowestAmbiguityPose(result);
+            }
+        }
+        return visionEst;
+    }
+
+    public void GoToAzimuth2() {
+        boolean targetVisible = false;
+        double targetYaw = 0.0;
+        var results = backRight.getAllUnreadResults();
+        if (!results.isEmpty()) {
+            // Camera processed a new frame since last
+            // Get the last one in the list.
+            var result = results.get(results.size() - 1);
             if (result.hasTargets()) {
-                for (PhotonTrackedTarget target : result.getTargets()) {
-                    targets.add(target);
+                // At least one AprilTag was seen by the camera
+                for (var target : result.getTargets()) {
+                    if (target.getFiducialId() == 7) {
+                        // Found Tag 7, record its information
+                        targetYaw = target.getYaw();
+                        targetVisible = true;
+                    }
                 }
             }
         }
-
-        return targets;        
     }
 }

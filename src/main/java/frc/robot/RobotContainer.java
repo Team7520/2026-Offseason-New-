@@ -6,9 +6,14 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,8 +24,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.Constants.UniverseConstants;
 import frc.robot.commands.ExtendAndRunIntake;
+import frc.robot.commands.GoToAzimuth;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
@@ -64,7 +70,15 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
     }
-
+/*
+    public void setLocation(Optional<EstimatedRobotPose> visionEst) {
+        visionEst.ifPresent(est -> {
+            Pose2d pose = est.estimatedPose.toPose2d();
+            drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
+        });
+        System.out.println(drivetrain.getPose());
+    }
+*/
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -111,16 +125,8 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );        
 
-        driver.a().whileTrue(
-            turret.turnHood(-0.1)
-        ).onFalse(
-            new InstantCommand(turret::stopAll)
-        );
-
-        driver.b().whileTrue(
-            turret.turnHood(0.1))
-        .onFalse(new InstantCommand(() -> turret.stopAll())
-        );
+        
+        driver.a().whileTrue(new GoToAzimuth(drivetrain.getPose(), UniverseConstants.redGoalPose.toPose2d(), turret));
 
         driver.povUp().onTrue(
             intake.blockerToggle()
@@ -133,15 +139,15 @@ public class RobotContainer {
         );
 
         driver.povLeft().whileTrue(
-            intake.extendIntake()
+            turret.turnHood(0.2)
         ).onFalse(
-            new InstantCommand(() -> intake.stopAll())
+            new InstantCommand(() -> turret.stopAll())
         );
 
         driver.povRight().whileTrue(
-            intake.retractIntake()
+            turret.turnHood(-0.1)
         ).onFalse(
-            new InstantCommand(() -> intake.stopAll())
+            new InstantCommand(() -> turret.stopAll())
         );
 
 

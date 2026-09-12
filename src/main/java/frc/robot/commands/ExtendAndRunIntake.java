@@ -7,7 +7,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class ExtendAndRunIntake extends Command {
   IntakeSubsystem intake;
   double speed;
-  Timer timer = new Timer();
+    Timer timer = new Timer();
 
   public ExtendAndRunIntake(IntakeSubsystem intake, double speed) {
     this.intake = intake;
@@ -31,7 +31,5 @@ public class ExtendAndRunIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     intake.stopAll();
-    timer.stop();
-    timer.reset();
   }
 }

@@ -454,6 +454,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        System.out.println(hoodMotor.getPosition().getValueAsDouble());
 //        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
 
         if (!availableAlliance) {
