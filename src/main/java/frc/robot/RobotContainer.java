@@ -8,13 +8,14 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
+import org.photonvision.EstimatedRobotPose;
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
@@ -34,8 +35,9 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
 import frc.robot.subsystems.DyerotorSubsystem; 
-import frc.robot.subsystems.IntakeSubsystem; 
+import frc.robot.subsystems.IntakeSubsystem;
 
+import java.util.List;
 import java.util.Optional;
 
 public class RobotContainer {
@@ -81,7 +83,7 @@ public class RobotContainer {
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
-        shootCommand = new ShootAndIndex(dyerotor, turret);
+        shootCommand = new ShootAndIndex(dyerotor, intake, turret);
 
         // Configure the button bindings
         configureBindings();
@@ -214,14 +216,14 @@ public class RobotContainer {
     traj.atTime("ShootOn").onTrue(
     Commands.runOnce(() -> {
         System.out.println("CHOREO EVENT: Shoot ON");
-                    shootCommand.schedule();
+       // shootCommand.schedule();
     })
 );
 
 traj.atTime("ShootOff").onTrue(
     Commands.runOnce(() -> {
         System.out.println("CHOREO EVENT: Shoot OFF");
-        shootCommand.cancel();
+        //shootCommand.cancel();
     })
 );
 

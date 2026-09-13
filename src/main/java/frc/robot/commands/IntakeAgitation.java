@@ -34,7 +34,7 @@ public class IntakeAgitation extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    intake.stopExtend();
+    intake.stopIntake();
     timer.stop();
     timer.reset();
   }

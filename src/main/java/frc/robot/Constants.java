@@ -31,7 +31,6 @@ public class Constants {
 
         public static final double INTAKE_AGITATE_POS = -3;
 
-        public static final double INTAKE_AGITATE_POS = -3;
 
         public static final double BLOCKER_EXTEND = -22;
         public static final double BLOCKER_RETRACT = 0;
@@ -60,6 +59,8 @@ public class Constants {
         public static final double HOOD_MAX_ROTATION = 3;
         public static final double HOOD_ANGLE_RANGE = HOOD_MAX_ANGLE-HOOD_MIN_ANGLE;
         public static final double HOOD_ROTATION_RANGE = HOOD_MAX_ROTATION-HOOD_MIN_ROTATION;
+        public static final double TURRET_FORWARD_LIMIT = 0.625;
+        public static final double TURRET_REVERSE_LIMIT = -0.625;
 
     }
 

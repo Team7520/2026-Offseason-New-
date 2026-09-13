@@ -11,16 +11,42 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.TurretConstants;
+import frc.robot.Constants.UniverseConstants;
 import frc.robot.generated.TunerConstants;
 
 import java.lang.Math;
+import java.util.NoSuchElementException;
 
 public class TurretSubsystem extends SubsystemBase {
+
+    public enum RobotZone {
+        SHOOTING,
+        RED_FEEDING_OUTPOST,
+        BLUE_FEEDING_OUTPOST,
+        RED_FEEDING_DEPOT,
+        BLUE_FEEDING_DEPOT,
+        UNDER_FAR_TRENCH,
+        NO_ALLIANCE
+
+    }
+    
+    StructPublisher<Pose2d> turretPosePublisher = NetworkTableInstance.getDefault().getStructTopic("TurretPose", Pose2d.struct).publish();
+
+
     private final TalonFX topMotorLeft;
     private final TalonFX topMotorRight;
     private final TalonFX hoodMotor;
