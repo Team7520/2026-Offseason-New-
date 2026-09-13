@@ -12,7 +12,6 @@ public class ExtendAndRunIntake extends Command {
   public ExtendAndRunIntake(IntakeSubsystem intake, double speed) {
     this.intake = intake;
     this.speed = speed;
-    addRequirements(intake);
   }
 
   @Override
@@ -32,5 +31,7 @@ public class ExtendAndRunIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     intake.stopAll();
+    timer.stop();
+    timer.reset();
   }
 }

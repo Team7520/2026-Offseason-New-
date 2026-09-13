@@ -133,7 +133,7 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
         TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
-        hoodConfig.Slot0.kP = 2;
+        hoodConfig.Slot0.kP = 1;
         hoodConfig.Slot0.kI = 0;
         hoodConfig.Slot0.kD = 0; // placeholder values
         hoodConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -457,9 +457,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        //System.out.println(hoodMotor.getPosition().getValueAsDouble());
+        System.out.println("Hood Position" + hoodMotor.getPosition().getValueAsDouble());
 //        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
-
+        SmartDashboard.putNumber("Hood Position", hoodMotor.getPosition().getValueAsDouble());
         if (!availableAlliance) {
             try {
                 if (DriverStation.getAlliance().get() == Alliance.Red) {

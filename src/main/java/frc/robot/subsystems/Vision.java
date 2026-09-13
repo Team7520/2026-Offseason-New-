@@ -8,6 +8,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -15,6 +16,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 
@@ -39,8 +42,10 @@ public class Vision {
 
     private final Transform3d robotToBackRight = new Transform3d(
         new Translation3d(.3452393654, .2823458412, .5360775664),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(-135))
+        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(135))
     );
+
+    Transform3d[] robotToCameras = {robotToFrontLeft, robotToFrontRight, robotToBackLeft, robotToBackRight};
 
     PhotonCamera frontLeft = new PhotonCamera("frontLeft");
     PhotonCamera frontRight = new PhotonCamera("frontRight");
@@ -95,24 +100,55 @@ public class Vision {
         return visionEsts;
     }
 
-    public void GoToAzimuth2() {
-        boolean targetVisible = false;
-        double targetYaw = 0.0;
-        var results = backRight.getAllUnreadResults();
-        if (!results.isEmpty()) {
-            // Camera processed a new frame since last
-            // Get the last one in the list.
-            var result = results.get(results.size() - 1);
-            if (result.hasTargets()) {
-                // At least one AprilTag was seen by the camera
-                for (var target : result.getTargets()) {
-                    if (target.getFiducialId() == 7) {
-                        // Found Tag 7, record its information
-                        targetYaw = target.getYaw();
-                        targetVisible = true;
-                    }
-                }
-            }
+    public double getCaptureTime(int index) {
+        PhotonPipelineResult result;
+        result = cameras[index].getLatestResult();
+        return result.getTimestampSeconds();
+  }
+
+    private PhotonPipelineResult getLatestCameraResult(PhotonCamera camera) {
+        List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+        if (results.isEmpty()) {
+            return new PhotonPipelineResult();
+        }
+        return results.get(results.size() - 1);
+    }
+
+    public Pose2d getCurrentRobotFieldPose(int index) {
+        PhotonPipelineResult result = null;
+        result = getLatestCameraResult(cameras[index]);
+        Transform3d robotToCamera = robotToCameras[index];
+        PhotonTrackedTarget target = result.getBestTarget();
+        if (target != null) {
+            Pose3d robotPose =
+                PhotonUtils.estimateFieldToRobotAprilTag(
+                target.getBestCameraToTarget(),
+                fieldLayout.getTagPose(target.getFiducialId()).get(),
+                robotToCamera.inverse());
+            return robotPose.toPose2d();
+        } else {
+            return null;
         }
     }
+
+    // public void GoToAzimuth2() {
+    //     boolean targetVisible = false;
+    //     double targetYaw = 0.0;
+    //     var results = backRight.getAllUnreadResults();
+    //     if (!results.isEmpty()) {
+    //         // Camera processed a new frame since last
+    //         // Get the last one in the list.
+    //         var result = results.get(results.size() - 1);
+    //         if (result.hasTargets()) {
+    //             // At least one AprilTag was seen by the camera
+    //             for (var target : result.getTargets()) {
+    //                 if (target.getFiducialId() == 7) {
+    //                     // Found Tag 7, record its information
+    //                     targetYaw = target.getYaw();
+    //                     targetVisible = true;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }

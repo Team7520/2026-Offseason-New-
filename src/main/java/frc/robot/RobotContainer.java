@@ -140,7 +140,7 @@ public class RobotContainer {
         );
 
         driver.povLeft().whileTrue(
-            turret.turnHood(0.2)
+            turret.turnHood(0.1)
         ).onFalse(
             new InstantCommand(() -> turret.stopAll())
         );
