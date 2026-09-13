@@ -28,6 +28,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 
 
+import frc.robot.subsystems.Vision;
 
 // import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.units.measure.Angle;
@@ -41,6 +42,7 @@ public class Robot extends TimedRobot {
 
     private final RobotContainer m_robotContainer;
     
+    Vision vision = new Vision();
 
     // private Timer disabledTimer;
 
@@ -88,6 +90,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
+        m_robotContainer.setLocation(vision.getTargets());
         //temp
         if (isSimulation()) {
 
@@ -100,7 +103,7 @@ public class Robot extends TimedRobot {
         // // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
         // // commands, running already-scheduled commands, removing finished or interrupted commands,
         // // and running subsystem periodic() methods.  This must be called from the robot's periodic
-        // // block in order for anything in the Command-based framework to work.
+        // // block in order for a)nything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
     }
 
