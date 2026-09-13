@@ -409,7 +409,7 @@ public class TurretSubsystem extends SubsystemBase {
                 bestChoice = d;
             }
         }
-        azimuthMotor.setControl(positionRequest.withPosition(bestChoice * TurretConstants.AZIMUTH_GEAR_RATIO));
+        azimuthMotor.setControl(positionRequest.withPosition(bestChoice));
     }
 
     public void hood(double speed) {
