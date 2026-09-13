@@ -180,7 +180,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
     AutoRoutine routine = autoFactory.newRoutine("MyAuto");
-    AutoTrajectory traj = routine.trajectory("DoubleSwipeBottom");
+    AutoTrajectory traj = routine.trajectory("DoubleSwipeTop");
 
     routine.active().onTrue(
         traj.resetOdometry().andThen(traj.cmd())
