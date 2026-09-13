@@ -27,6 +27,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX blockerMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionDutyCycle pos = new PositionDutyCycle(0);
+    double extendedPosition = -16.5; // placeholder value
+    double retractedPosition = -5; // placeholder value
     private final double CURRENT_THRESHOLD = -20; // placeholder value
     private final PositionVoltage positionRequest = new PositionVoltage(0);
     boolean current = false;
@@ -38,13 +40,13 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor = new TalonFX(IntakeConstants.BLOCKER_MOTOR_ID); // Placeholder IDs
         
         TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
-        intakeConfig.Slot0.kP = 8; // placeholder value
+        intakeConfig.Slot0.kP = 1; // placeholder value
         intakeConfig.Slot0.kI = 0; // placeholder value
         intakeConfig.Slot0.kD = 0; // placeholder value
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 60; // placeholder value
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 20; // placeholder value
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLimit = 70; // placeholder value
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder value
 
         intakeMotorLeft.getConfigurator().apply(intakeConfig);
         intakeMotorLeft.setNeutralMode(NeutralModeValue.Brake);
@@ -52,19 +54,19 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotorRight.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration extendConfig = new TalonFXConfiguration();
-        extendConfig.Slot0.kP = 5; // placeholder value
+        extendConfig.Slot0.kP = 1; // placeholder value
         extendConfig.Slot0.kI = 0; // placeholder value
         extendConfig.Slot0.kD = 0; // placeholder value
         extendConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
+        //extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
         extendConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        extendConfig.CurrentLimits.StatorCurrentLimit = 150; // placeholder value
+        //extendConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder value
 
         extendMotor.getConfigurator().apply(extendConfig);
         extendMotor.setNeutralMode(NeutralModeValue.Brake);
 
         TalonFXConfiguration blockerConfig = new TalonFXConfiguration();
-        blockerConfig.Slot0.kP = 5; // placeholder value
+        blockerConfig.Slot0.kP = 10; // placeholder value
         blockerConfig.Slot0.kI = 0; // placeholder value
         blockerConfig.Slot0.kD = 0; // placeholder value
         blockerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -137,21 +139,16 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void extend() {
-        if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
-            extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
-        }
-//        setBrakeMode();
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
     }
 
     public void retractWithSpeed(double speed) {
-        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withVelocity(speed).withEnableFOC(true));
-//        setBrakeMode();
+        extendMotor.setControl(pos.withPosition(retractedPosition).withVelocity(speed)); // placeholder value
         stopIntake();
     }
 
     public void retract() {
-        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withEnableFOC(true));
-//        setBrakeMode();
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT));
         stopIntake();
     }
 
@@ -165,21 +162,11 @@ public class IntakeSubsystem extends SubsystemBase {
         // System.out.print(error);
         return error < 0.1;
     }
-/*
-    public void setBrakeMode() {
-        double position = extendMotor.getPosition().getValueAsDouble();
-        if (position > -1) {
-            extendMotor.setNeutralMode(NeutralModeValue.Brake);
-        } else {
-            extendMotor.setNeutralMode(NeutralModeValue.Coast);
-        }
-    }
-*/
-/*
+
     public double getExtendedPosition() {
-        return IntakeConstants.INTAKE_EXTEND;
+        return extendedPosition;
     }
-*/
+
     public void setCoast() {
         extendMotor.setControl(new CoastOut());
     }
@@ -192,12 +179,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command extendIntake() {
-        return Commands.run(() -> extend()).until(() -> atTarget(IntakeConstants.INTAKE_EXTEND));
+        return Commands.run(() -> extend(), this).until(() -> atTarget(extendedPosition));
         // .finallyDo(() -> setNeutral());
     }
 
     public Command retractIntake() {
-        return Commands.run(() -> retract(), this).until(() -> atTarget(IntakeConstants.INTAKE_RETRACT));
+        return Commands.runOnce(() -> retract(), this);
     }
 
     public Command slowRetract() {
@@ -221,16 +208,11 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor.setControl(duty.withOutput(0));
     }
 
-    public void stopExtend() {
-        extendMotor.setControl(duty.withOutput(0));
-    }
-
     @Override
     public void periodic() {
-        // System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
-        // System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
+        SmartDashboard.putNumber(
+            "Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
         
     }
 }

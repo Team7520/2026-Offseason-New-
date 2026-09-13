@@ -28,17 +28,13 @@ public class ShootAndIndex extends Command {
     turret.setAzimuth(0);
     turret.spinFlywheels(0.6);
     if (timer.hasElapsed(0.3)) {
-      dyerotor.spinWheel(0.9);
-    }
-    if (timer.hasElapsed(0.35)) {
-      dyerotor.spinDye(0.6);
+      dyerotor.spinDyeAndWheel(0.65, 0.6);
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    dyerotor.spinWheel(0);
-    dyerotor.spinDye(0);
+    dyerotor.spinDyeAndWheel(0, 0);
     turret.spinFlywheels(0);
     timer.stop();
     timer.reset();

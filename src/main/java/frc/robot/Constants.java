@@ -11,10 +11,10 @@ public class Constants {
         public static final int EXTEND_MOTOR_ID = 3;
         public static final int BLOCKER_MOTOR_ID = 4;
 
-        public static final double INTAKE_EXTEND = -6;
+        public static final double INTAKE_EXTEND = 1.0;
         public static final double INTAKE_RETRACT = 0.0;
 
-        public static final double BLOCKER_EXTEND = -22;
+        public static final double BLOCKER_EXTEND = -1.3;
         public static final double BLOCKER_RETRACT = 0;
     }
 
@@ -42,8 +42,6 @@ public class Constants {
         public static final double HOOD_ANGLE_RANGE = HOOD_MAX_ANGLE-HOOD_MIN_ANGLE;
         public static final double HOOD_ROTATION_RANGE = HOOD_MAX_ROTATION-HOOD_MIN_ROTATION;
 
-        public static final double TURRET_FORWARD_LIMIT = 0.625;
-        public static final double TURRET_REVERSE_LIMIT = -0.625;
     }
 
     public static class UniverseConstants {

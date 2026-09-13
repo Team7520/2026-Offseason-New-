@@ -6,24 +6,15 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-<<<<<<< HEAD
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-=======
-import edu.wpi.first.math.geometry.Pose2d;
->>>>>>> d876f9936aec1e4b6326b615d5ccbe22b8ef1aae
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
@@ -35,15 +26,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.UniverseConstants;
-import frc.robot.commands.ExtendAndRunIntake;
-import frc.robot.commands.GoToAzimuth;
-import frc.robot.commands.RetractIntake;
+
 import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
 
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
 import frc.robot.subsystems.DyerotorSubsystem; 
 import frc.robot.subsystems.IntakeSubsystem; 
@@ -75,7 +63,7 @@ public class RobotContainer {
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
-    public final Drive drivetrain = TunerConstants.createDrivetrain();
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
 
     
@@ -101,18 +89,8 @@ public class RobotContainer {
 
     }
 
-<<<<<<< HEAD
     
     
-=======
-    public void setLocation(List<EstimatedRobotPose> visionEsts) {
-        for (var est : visionEsts) {
-            Pose2d pose = est.estimatedPose.toPose2d();
-            drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
-        }
-        // System.out.println(drivetrain.getPose());
-    }
->>>>>>> d876f9936aec1e4b6326b615d5ccbe22b8ef1aae
 
     private void configureBindings() {
         
@@ -126,11 +104,11 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-/*
+
         dyerotor.setDefaultCommand (
             dyerotor.intakeDyeAndWheel(-0.1, 0)
         );
-*/
+
         driver.rightTrigger().whileTrue(
             shootCommand
         );
@@ -185,31 +163,14 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );        
 
-        
-        driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
-
-        driver.povUp().onTrue(
-            intake.blockerToggle()
-        ).onFalse(new InstantCommand(turret::stopAll));
-
-        driver.povDown().whileTrue(
-            intake.spinRoller(0.9))
-        .onFalse(
-            new InstantCommand(() -> intake.stopAll())
+        driver.b().whileTrue(
+            turret.turnHood(0.1))
+        .onFalse(new InstantCommand(() -> turret.stopAll())
         );
 
-        driver.povLeft().whileTrue(
-            turret.turnHood(0.2)
-        ).onFalse(
-            new InstantCommand(() -> turret.stopAll())
-        );
-
-        driver.povRight().whileTrue(
-            turret.turnHood(-0.1)
-        ).onFalse(
-            new InstantCommand(() -> turret.stopAll())
-        );
-
+// Final y command: reverse shooter and dye wheels
+        // driver
+        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
 
 // Final x command: x-cross wheels
         // drive.x().whileTrue(drivetrain.applyRequest(() -> brake));
