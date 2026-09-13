@@ -54,7 +54,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionVoltage positionRequest = new PositionVoltage(0);
 
-    Drive drive;
+    CommandSwerveDrivetrain drive;
 
     Alliance currentAlliance = null;
     boolean availableAlliance = false;
@@ -78,7 +78,7 @@ public class TurretSubsystem extends SubsystemBase {
     private Pose2d feedOutpostPose;
     private Pose2d feedDepotPose;
 
-    public TurretSubsystem(Drive drive) {
+    public TurretSubsystem(CommandSwerveDrivetrain drive) {
         this.drive = drive;
 
         topMotorLeft = new TalonFX(TurretConstants.TOP_MOTOR_ID_LEFT);
@@ -205,13 +205,13 @@ public class TurretSubsystem extends SubsystemBase {
     * @return an Rotation2D from −180°, 180°
     */
     public Rotation2d calculateTurretAzimuth(Pose2d robotPose, Pose2d goalPose) {
-        Transform2d robotToTurret = new Transform2d(new Translation2d(), new Rotation2d()); // 5.5 inches
+        Transform2d robotToTurret = new Transform2d(new Translation2d(), new Rotation2d());
         Pose2d turretPose = robotPose.transformBy(robotToTurret);
         Translation2d turretToGoal = goalPose.getTranslation().minus(turretPose.getTranslation());
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
 
-        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(2*Math.PI / 3)); // Adjust for turret 90 degree offset angle
+        return fieldAngle.minus(robotPose.getRotation()).minus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
     }
 /*
     public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {

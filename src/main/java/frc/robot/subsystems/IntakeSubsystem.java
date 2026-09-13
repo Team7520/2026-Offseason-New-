@@ -82,12 +82,14 @@ public class IntakeSubsystem extends SubsystemBase {
     // BLOCKER functions
 
     public void setBlocker() {
-        if (current == false) {
-            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
-            current = true;
-        } else {
-            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
-            current = false;
+        if (extendMotor.getPosition().getValueAsDouble() > -1) {
+            if (current == false) {
+                blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
+                current = true;
+            } else {
+                blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
+                current = false;
+            }
         }
     }
 
@@ -138,7 +140,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void extend() {
         if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
-            extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND));
+            extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND).withEnableFOC(true));
         }
 //        setBrakeMode();
     }
@@ -158,12 +160,24 @@ public class IntakeSubsystem extends SubsystemBase {
     public void resetPosition(double position) {
         extendMotor.setPosition(position);
     }
+
+    public void agitate() {
+        extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_AGITATE_POS).withEnableFOC(true));
+    }
     
     public boolean atTarget(double position) {
         double current = extendMotor.getPosition().getValueAsDouble();
         double error = Math.abs(position - current);
         // System.out.print(error);
         return error < 0.1;
+    }
+
+    public boolean intakeDown() {
+        if (extendMotor.getPosition().getValueAsDouble() < -1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 /*
     public void setBrakeMode() {
@@ -228,7 +242,6 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
-        // System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
         

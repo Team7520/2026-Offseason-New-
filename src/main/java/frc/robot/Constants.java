@@ -29,6 +29,8 @@ public class Constants {
         public static final double INTAKE_EXTEND = -6;
         public static final double INTAKE_RETRACT = 0.0;
 
+        public static final double INTAKE_AGITATE_POS = -3;
+
         public static final double BLOCKER_EXTEND = -22;
         public static final double BLOCKER_RETRACT = 0;
     }
