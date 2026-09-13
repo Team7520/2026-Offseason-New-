@@ -100,7 +100,7 @@ public class RobotContainer {
 */
 
         driver.rightTrigger().whileTrue(
-            new ParallelCommandGroup(new ShootAndIndex(dyerotor, intake, turret),
+            new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
             new IntakeAgitation(intake))
         );
 
@@ -130,7 +130,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );        
 
-        // driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
+        driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
 
         driver.povUp().onTrue(
             intake.blockerToggle()

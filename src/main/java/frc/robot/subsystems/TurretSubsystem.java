@@ -156,7 +156,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setTurretAzimuth(Rotation2d targetAngle) {
-        double target = targetAngle.getRotations();
+        double target = -targetAngle.getRotations();
         double clampedTarget = optimizeTurretPosition(target);
         SmartDashboard.putNumber("Clamped Target", clampedTarget);
         azimuthMotor.setControl(positionRequest.withPosition(clampedTarget));
@@ -211,7 +211,7 @@ public class TurretSubsystem extends SubsystemBase {
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
 
-        return fieldAngle.minus(robotPose.getRotation()).minus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
     }
 /*
     public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {
