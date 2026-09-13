@@ -9,7 +9,14 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import choreo.Choreo;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,6 +35,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
 import frc.robot.subsystems.DyerotorSubsystem; 
 import frc.robot.subsystems.IntakeSubsystem; 
+
+import java.util.Optional;
 
 public class RobotContainer {
     // Subsystems
@@ -53,6 +62,15 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
+
+    private final AutoFactory autoFactory = new AutoFactory(
+        drivetrain::getPose,
+        drivetrain::resetPose,
+        drivetrain::followPath,
+        true,          // mirror trajectory based on alliance
+        drivetrain
+    );
 
     public RobotContainer() {
         turret = new TurretSubsystem();
@@ -62,6 +80,7 @@ public class RobotContainer {
         // Configure the button bindings
         configureBindings();
     }
+    
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -149,21 +168,24 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
-        return Commands.sequence(
-            // Reset our field centric heading to match the robot
-            // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-            // Then slowly drive forward (away from us) for 5 seconds.
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)
-            )
-            .withTimeout(5.0),
-            // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
-        );
-    }
+    AutoRoutine routine = autoFactory.newRoutine("MyAuto");
+    AutoTrajectory traj = routine.trajectory("DoubleSwipeTop");
+
+    routine.active().onTrue(
+        traj.resetOdometry().andThen(traj.cmd())
+    );
+
+    traj.atTime("IntakeOn").onTrue(
+        Commands.runOnce(() -> {
+            System.out.println("CHOREO EVENT TRIGGERED: IntakeOn!");
+            intake.manualExtend(0.5);
+        }, intake)
+    );
+
+    traj.atTime("IntakeOff").onTrue(
+        new InstantCommand(() -> intake.stopAll())
+    );
+
+    return routine.cmd();
+}
 }

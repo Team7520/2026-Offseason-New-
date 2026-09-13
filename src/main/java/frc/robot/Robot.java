@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.HootAutoReplay;
 // import com.ctre.phoenix6.StatusSignal;
 // import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -12,19 +14,33 @@ import com.ctre.phoenix6.HootAutoReplay;
 // import com.ctre.phoenix6.hardware.CANcoder;
 // import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 // import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+
+
 
 // import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.units.measure.Angle;
 
 public class Robot extends TimedRobot {
+    
+    
+
+    
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
+    
 
     // private Timer disabledTimer;
 
@@ -37,6 +53,13 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         m_robotContainer = new RobotContainer();
+        System.out.println("Deploy directory: " + edu.wpi.first.wpilibj.Filesystem.getDeployDirectory().getAbsolutePath());
+        //temp
+        if (isSimulation()) {
+            m_robotContainer.drivetrain.resetPose(new Pose2d(4.6, 7.6, Rotation2d.fromDegrees(0)));
+            DriverStationSim.setAllianceStationId(edu.wpi.first.hal.AllianceStationID.Blue3);
+            DriverStationSim.notifyNewData();
+        }
     }
 
 // @Override
@@ -65,6 +88,11 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
+        //temp
+        if (isSimulation()) {
+
+            DriverStationSim.notifyNewData();
+        }
 
         // StatusSignal<Angle> angle = absoluteEncoder.getAbsolutePosition().waitForUpdate(0.1);
 
