@@ -227,7 +227,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
+        System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
         // System.out.println("Target: " + IntakeConstants.INTAKE_EXTEND);
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());

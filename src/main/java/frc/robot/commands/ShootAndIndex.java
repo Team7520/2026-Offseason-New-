@@ -40,6 +40,7 @@ public class ShootAndIndex extends Command {
     dyerotor.spinWheel(0);
     dyerotor.spinDye(0);
     turret.spinFlywheels(0);
+    turret.setHoodAngle(0);
     timer.stop();
     timer.reset();
   }

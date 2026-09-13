@@ -12,6 +12,7 @@ public class ExtendAndRunIntake extends Command {
   public ExtendAndRunIntake(IntakeSubsystem intake, double speed) {
     this.intake = intake;
     this.speed = speed;
+    addRequirements(intake);
   }
 
   @Override

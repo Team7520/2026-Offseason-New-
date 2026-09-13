@@ -11,6 +11,8 @@ public class RetractIntake extends Command {
   public RetractIntake(IntakeSubsystem intake, double speed) {
     this.intake = intake;
     this.speed = speed;
+    addRequirements(intake);
+
   }
 
   @Override

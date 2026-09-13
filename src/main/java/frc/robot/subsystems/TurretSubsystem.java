@@ -78,7 +78,9 @@ public class TurretSubsystem extends SubsystemBase {
     private Pose2d feedOutpostPose;
     private Pose2d feedDepotPose;
 
-    public TurretSubsystem() {
+    public TurretSubsystem(Drive drive) {
+        this.drive = drive;
+
         topMotorLeft = new TalonFX(TurretConstants.TOP_MOTOR_ID_LEFT);
         topMotorRight = new TalonFX(TurretConstants.TOP_MOTOR_ID_RIGHT);
         hoodMotor = new TalonFX(TurretConstants.HOOD_MOTOR_ID);
@@ -126,6 +128,7 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthLimits.ReverseSoftLimitThreshold = -0.75;
 
         azimuthConfig.SoftwareLimitSwitch = azimuthLimits;
+        azimuthConfig.Feedback.SensorToMechanismRatio = -1;
         azimuthMotor.getConfigurator().apply(azimuthConfig);
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
@@ -208,7 +211,7 @@ public class TurretSubsystem extends SubsystemBase {
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
 
-        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(Math.PI / 2)); // Adjust for turret 90 degree offset angle
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(2*Math.PI / 3)); // Adjust for turret 90 degree offset angle
     }
 /*
     public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {
@@ -454,8 +457,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println(hoodMotor.getPosition().getValueAsDouble());
-//        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
 
         if (!availableAlliance) {
             try {

@@ -64,7 +64,7 @@ public class RobotContainer {
     public final Drive drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
-        turret = new TurretSubsystem();
+        turret = new TurretSubsystem(drivetrain);
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
@@ -77,7 +77,7 @@ public class RobotContainer {
             Pose2d pose = est.estimatedPose.toPose2d();
             drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
         }
-        // System.out.println(drivetrain.getPose());
+        System.out.println(drivetrain.getPose());
     }
 
     private void configureBindings() {
