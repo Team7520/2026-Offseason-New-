@@ -10,8 +10,6 @@ public class ShootAndIndex extends Command {
   DyerotorSubsystem dyerotor;
   IntakeSubsystem intake;
   TurretSubsystem turret;
-  double speed1;
-  double speed2;
   Timer timer = new Timer();
 
   public ShootAndIndex(DyerotorSubsystem dyerotor, IntakeSubsystem intake, TurretSubsystem turret) {

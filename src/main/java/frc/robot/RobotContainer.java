@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -28,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.UniverseConstants;
 import frc.robot.commands.ExtendAndRunIntake;
 import frc.robot.commands.GoToAzimuth;
+import frc.robot.commands.IntakeAgitation;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
@@ -47,7 +49,7 @@ public class RobotContainer {
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
 
-    private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -96,8 +98,10 @@ public class RobotContainer {
             dyerotor.intakeDyeAndWheel(-0.1, 0)
         );
 */
+
         driver.rightTrigger().whileTrue(
-            new ShootAndIndex(dyerotor, intake, turret)
+            new ParallelCommandGroup(new ShootAndIndex(dyerotor, intake, turret),
+            new IntakeAgitation(intake))
         );
 
         driver.leftTrigger().whileTrue(
@@ -126,8 +130,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );        
 
-        
-        driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
+        // driver.a().whileTrue(new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret));
 
         driver.povUp().onTrue(
             intake.blockerToggle()
