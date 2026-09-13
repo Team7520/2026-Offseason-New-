@@ -3,8 +3,23 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class Constants {
+    public static final Mode simMode = Mode.SIM;
+  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+  
     public static class IntakeConstants {
         public static final int INTAKE_MOTOR_LEFT_ID = 1;
         public static final int INTAKE_MOTOR_RIGHT_ID = 2;
@@ -14,7 +29,11 @@ public class Constants {
         public static final double INTAKE_EXTEND = 1.0;
         public static final double INTAKE_RETRACT = 0.0;
 
-        public static final double BLOCKER_EXTEND = -1.3;
+        public static final double INTAKE_AGITATE_POS = -3;
+
+        public static final double INTAKE_AGITATE_POS = -3;
+
+        public static final double BLOCKER_EXTEND = -22;
         public static final double BLOCKER_RETRACT = 0;
     }
 

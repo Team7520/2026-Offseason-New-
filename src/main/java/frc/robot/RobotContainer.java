@@ -77,7 +77,7 @@ public class RobotContainer {
     );
 
     public RobotContainer() {
-        turret = new TurretSubsystem();
+        turret = new TurretSubsystem(drivetrain);
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
@@ -85,12 +85,15 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureBindings();
-
-
     }
 
-    
-    
+    public void setLocation(List<EstimatedRobotPose> visionEsts) {
+        for (var est : visionEsts) {
+            Pose2d pose = est.estimatedPose.toPose2d();
+            drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
+        }
+        System.out.println(drivetrain.getPose());
+    }
 
     private void configureBindings() {
         
@@ -168,9 +171,18 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );
 
-// Final y command: reverse shooter and dye wheels
-        // driver
-        // .y().whileTrue(new ReverseWheels(dyerotor, -0.9, turret, -0.6));
+        driver.povLeft().whileTrue(
+            turret.turnHood(0.1)
+        ).onFalse(
+            new InstantCommand(() -> turret.stopAll())
+        );
+
+        driver.povRight().whileTrue(
+            turret.turnHood(-0.1)
+        ).onFalse(
+            new InstantCommand(() -> turret.stopAll())
+        );
+
 
 // Final x command: x-cross wheels
         // drive.x().whileTrue(drivetrain.applyRequest(() -> brake));

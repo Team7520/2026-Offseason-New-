@@ -18,6 +18,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -40,7 +42,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-//placeholder values for PID
     private final PIDController m_pathXController = new PIDController(10, 0, 0);
 private final PIDController m_pathYController = new PIDController(10, 0, 0);
 private final PhoenixPIDController m_pathThetaController = new PhoenixPIDController(0, 0, 0);
@@ -78,6 +79,8 @@ System.out.println("Heading error (rad): " + headingError + " | measured: " + po
             .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
     );
 }
+    Vision vision = new Vision();
+
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -93,6 +96,9 @@ System.out.println("Heading error (rad): " + headingError + " | measured: " + po
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    StructPublisher<Pose2d> currentPosePublisher =
+      NetworkTableInstance.getDefault().getStructTopic("MyPose", Pose2d.struct).publish();
 
     public Pose2d getPose() {
         return getState().Pose;
@@ -287,6 +293,16 @@ System.out.println("Heading error (rad): " + headingError + " | measured: " + po
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        for (int i = 0 ; i < 4; i++) {
+            double captureTime = vision.getCaptureTime(i);
+            Pose2d pose = vision.getCurrentRobotFieldPose(i);
+            if (pose != null) {
+                addVisionMeasurement(pose, captureTime);
+            }
+        }
+
+        currentPosePublisher.set(getPose());
     }
 
     private void startSimThread() {
