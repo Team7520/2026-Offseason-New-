@@ -43,6 +43,8 @@ public class RobotContainer {
     private final TurretSubsystem turret;
     private final DyerotorSubsystem dyerotor;
     private final IntakeSubsystem intake;
+    //shooting
+    final ShootAndIndex shootCommand;
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -62,6 +64,8 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+
     
 
     private final AutoFactory autoFactory = new AutoFactory(
@@ -77,12 +81,19 @@ public class RobotContainer {
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
+        shootCommand = new ShootAndIndex(dyerotor, turret);
+
         // Configure the button bindings
         configureBindings();
+
+
     }
+
+    
     
 
     private void configureBindings() {
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -99,7 +110,7 @@ public class RobotContainer {
         );
 
         driver.rightTrigger().whileTrue(
-            new ShootAndIndex(dyerotor, turret)
+            shootCommand
         );
 
         driver.leftTrigger().onTrue(
@@ -169,7 +180,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
     AutoRoutine routine = autoFactory.newRoutine("MyAuto");
-    AutoTrajectory traj = routine.trajectory("DoubleSwipeTop");
+    AutoTrajectory traj = routine.trajectory("DoubleSwipeBottom");
 
     routine.active().onTrue(
         traj.resetOdometry().andThen(traj.cmd())
@@ -183,8 +194,24 @@ public class RobotContainer {
     );
 
     traj.atTime("IntakeOff").onTrue(
-        new InstantCommand(() -> intake.stopAll())
+                Commands.runOnce(() -> {
+            System.out.println("CHOREO EVENT TRIGGERED: IntakeOff!");
+            intake.stopAll();
+        }, intake)
     );
+    traj.atTime("ShootOn").onTrue(
+    Commands.runOnce(() -> {
+        System.out.println("CHOREO EVENT: Shoot ON");
+                    shootCommand.schedule();
+    })
+);
+
+traj.atTime("ShootOff").onTrue(
+    Commands.runOnce(() -> {
+        System.out.println("CHOREO EVENT: Shoot OFF");
+        shootCommand.cancel();
+    })
+);
 
     return routine.cmd();
 }

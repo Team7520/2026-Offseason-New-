@@ -288,7 +288,5 @@
  "events":[
    {"name":"IntakeOn", "from":{"target":6, "targetTimestamp":5.80245, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"wait", "data":{"waitTime":{"exp":"10 s", "val":10.0}}}},
    {"name":"IntakeOff", "from":{"target":7, "targetTimestamp":6.33231, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"sequential", "data":{"commands":[
-       {"type":"named", "data":{"name":"IntakeOn"}}]}}},
-   {"name":"test67", "from":{"target":4, "targetTimestamp":4.024, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"sequential", "data":{"commands":[
-       {"type":"named", "data":{"name":"test67"}}]}}}]
+       {"type":"named", "data":{"name":"IntakeOn"}}]}}}]
 }

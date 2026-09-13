@@ -139,7 +139,6 @@ public class TurretSubsystem extends SubsystemBase {
         double toRotations = TurretConstants.HOOD_MIN_ROTATION + normalized * TurretConstants.HOOD_ROTATION_RANGE;
 
         hoodMotor.setControl(positionRequest.withPosition(toRotations));
-        System.out.println("running");
 
     }
 
@@ -165,6 +164,5 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
     }
 }

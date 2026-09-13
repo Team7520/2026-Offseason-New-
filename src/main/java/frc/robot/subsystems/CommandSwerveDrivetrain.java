@@ -10,6 +10,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.Matrix;
@@ -52,23 +53,29 @@ private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds =
 }
 
 public void followPath(SwerveSample sample) {
-    
     Pose2d pose = getState().Pose;
 
     // Build speeds from raw sample fields directly, bypassing getChassisSpeeds()
     ChassisSpeeds targetSpeeds = new ChassisSpeeds(sample.vx, sample.vy, sample.omega);
 
-
     targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
     targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
-    // targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
-    //     pose.getRotation().getRadians(),
-    //     sample.heading,
-    //     Utils.getCurrentTimeSeconds()
-    // );
+    targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
+        pose.getRotation().getRadians(),
+        sample.heading,
+        Utils.getCurrentTimeSeconds()
+    );
+
+    ChassisSpeeds discretized = ChassisSpeeds.discretize(targetSpeeds, 0.02);
+    double headingError = sample.heading - pose.getRotation().getRadians();
+System.out.println("Heading error (rad): " + headingError + " | measured: " + pose.getRotation().getRadians() + " | target: " + sample.heading);
 
     setControl(
-        m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds)
+        m_pathApplyFieldSpeeds
+            .withSpeeds(discretized)
+            .withWheelForceFeedforwardsX(sample.moduleForcesX())
+            .withWheelForceFeedforwardsY(sample.moduleForcesY())
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
     );
 }
     private static final double kSimLoopPeriod = 0.004; // 4 ms
@@ -263,7 +270,6 @@ public void followPath(SwerveSample sample) {
 
     @Override
     public void periodic() {
-        System.out.println("Measured omega: " + getState().Speeds.omegaRadiansPerSecond);
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
