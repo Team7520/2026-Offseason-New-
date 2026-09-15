@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
         //temp
         if (isSimulation()) {
             m_robotContainer.drivetrain.resetPose(new Pose2d(4.6, 7.6, Rotation2d.fromDegrees(0)));
-            DriverStationSim.setAllianceStationId(edu.wpi.first.hal.AllianceStationID.Blue3);
+            DriverStationSim.setAllianceStationId(edu.wpi.first.hal.AllianceStationID.Red3);
             DriverStationSim.notifyNewData();
         }
     }

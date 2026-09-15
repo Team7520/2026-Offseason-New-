@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,17 +37,24 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.TurretSubsystem; 
 import frc.robot.subsystems.DyerotorSubsystem; 
 import frc.robot.subsystems.IntakeSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
 import java.util.Optional;
 
+
+
+
 public class RobotContainer {
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
     // Subsystems
     private final TurretSubsystem turret;
     private final DyerotorSubsystem dyerotor;
     private final IntakeSubsystem intake;
     //shooting
     final ShootAndIndex shootCommand;
+
+
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
@@ -87,6 +95,11 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureBindings();
+        autoChooser.setDefaultOption("Double Swipe Top", buildAuto("DoubleSwipeTop"));
+        autoChooser.addOption("Double Swipe Bottom", buildAuto("DoubleSwipeBottom"));
+        autoChooser.addOption("Do Nothing", Commands.none());
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     public void setLocation(List<EstimatedRobotPose> visionEsts) {
@@ -192,9 +205,9 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
-    public Command getAutonomousCommand() {
-    AutoRoutine routine = autoFactory.newRoutine("MyAuto");
-    AutoTrajectory traj = routine.trajectory("DoubleSwipeTop");
+    private Command buildAuto(String trajectoryName) {
+    AutoRoutine routine = autoFactory.newRoutine(trajectoryName);
+    AutoTrajectory traj = routine.trajectory(trajectoryName);
 
     routine.active().onTrue(
         traj.resetOdometry().andThen(traj.cmd())
@@ -208,25 +221,30 @@ public class RobotContainer {
     );
 
     traj.atTime("IntakeOff").onTrue(
-                Commands.runOnce(() -> {
+        Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT TRIGGERED: IntakeOff!");
             intake.stopAll();
         }, intake)
     );
-    traj.atTime("ShootOn").onTrue(
-    Commands.runOnce(() -> {
-        System.out.println("CHOREO EVENT: Shoot ON");
-       // shootCommand.schedule();
-    })
-);
 
-traj.atTime("ShootOff").onTrue(
-    Commands.runOnce(() -> {
-        System.out.println("CHOREO EVENT: Shoot OFF");
-        //shootCommand.cancel();
-    })
-);
+    traj.atTime("ShootOn").onTrue(
+        Commands.runOnce(() -> {
+            System.out.println("CHOREO EVENT: Shoot ON");
+            // shootCommand.schedule();
+        })
+    );
+
+    traj.atTime("ShootOff").onTrue(
+        Commands.runOnce(() -> {
+            System.out.println("CHOREO EVENT: Shoot OFF");
+            // shootCommand.cancel();
+        })
+    );
 
     return routine.cmd();
 }
+public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
+}
+
 }
