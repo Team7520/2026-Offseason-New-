@@ -6,8 +6,6 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakeAgitation extends Command {
   IntakeSubsystem intake;
-  double speed1;
-  double speed2;
   boolean agitateAgain = true;
   Timer timer = new Timer();
 
@@ -22,15 +20,15 @@ public class IntakeAgitation extends Command {
 
   @Override
   public void execute() {
-    if (agitateAgain) {
+/*    if (agitateAgain) {
       intake.agitate();
       agitateAgain = false;
     }
-    if (timer.hasElapsed(1)) {
+    if (timer.hasElapsed(0.5)) {
       agitateAgain = true;
       timer.reset();
     }
-  }
+*/  }
 
   @Override
   public void end(boolean interrupted) {

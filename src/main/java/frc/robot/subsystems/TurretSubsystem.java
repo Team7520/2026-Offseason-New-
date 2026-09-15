@@ -118,18 +118,18 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 60;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 40;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 40; // placeholder values
+        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder values
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
-        azimuthLimits.ForwardSoftLimitThreshold = 0.75;
+        azimuthLimits.ForwardSoftLimitThreshold = 0.45;
         azimuthLimits.ReverseSoftLimitEnable = true;
-        azimuthLimits.ReverseSoftLimitThreshold = -0.75;
+        azimuthLimits.ReverseSoftLimitThreshold = -0.45;
 
         azimuthConfig.SoftwareLimitSwitch = azimuthLimits;
-        azimuthConfig.Feedback.SensorToMechanismRatio = -1;
+        azimuthConfig.Feedback.SensorToMechanismRatio = 1;
         azimuthMotor.getConfigurator().apply(azimuthConfig);
         azimuthMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
 
@@ -157,7 +157,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setTurretAzimuth(Rotation2d targetAngle) {
-        double target = targetAngle.getRotations();
+        double target = -targetAngle.getRotations();
         double clampedTarget = optimizeTurretPosition(target);
         SmartDashboard.putNumber("Clamped Target", clampedTarget);
         azimuthMotor.setControl(positionRequest.withPosition(clampedTarget));
@@ -212,7 +212,7 @@ public class TurretSubsystem extends SubsystemBase {
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
 
-        return fieldAngle.minus(robotPose.getRotation()).minus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
     }
 /*
     public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {
@@ -452,8 +452,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println("Hood Position" + hoodMotor.getPosition().getValueAsDouble());
-//        System.out.println(azimuthMotor.getPosition().getValueAsDouble());
+//        System.out.println("Hood Position: " + hoodMotor.getPosition().getValueAsDouble());
+        System.out.println("Azimuth Motor Position: " + azimuthMotor.getPosition().getValueAsDouble());
+        System.out.println("Encoder Motor Position: " + encoder.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Hood Position", hoodMotor.getPosition().getValueAsDouble());
         if (!availableAlliance) {
             try {
