@@ -96,7 +96,7 @@ public class RobotContainer {
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
-        shootCommand = new ShootAndIndex(dyerotor, intake, turret);
+        shootCommand = new ShootAndIndex(dyerotor, turret);
 
         // Configure the button bindings
         configureBindings();
