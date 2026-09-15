@@ -123,9 +123,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
-        azimuthLimits.ForwardSoftLimitThreshold = 0.45;
+        azimuthLimits.ForwardSoftLimitThreshold = 0.72;
         azimuthLimits.ReverseSoftLimitEnable = true;
-        azimuthLimits.ReverseSoftLimitThreshold = -0.45;
+        azimuthLimits.ReverseSoftLimitThreshold = -0.72;
 
         azimuthConfig.SoftwareLimitSwitch = azimuthLimits;
         azimuthConfig.Feedback.SensorToMechanismRatio = 1;
@@ -458,8 +458,8 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 //        System.out.println("Hood Position: " + hoodMotor.getPosition().getValueAsDouble());
-        System.out.println("Azimuth Motor Position: " + azimuthMotor.getPosition().getValueAsDouble());
-        System.out.println("Encoder Motor Position: " + encoder.getPosition().getValueAsDouble());
+//        System.out.println("Azimuth Motor Position: " + azimuthMotor.getPosition().getValueAsDouble());
+//        System.out.println("Encoder Motor Position: " + encoder.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Hood Position", hoodMotor.getPosition().getValueAsDouble());
         if (!availableAlliance) {
             try {

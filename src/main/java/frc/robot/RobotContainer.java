@@ -74,13 +74,13 @@ public class RobotContainer {
         configureBindings();
     }
 
-    public void setLocation(List<EstimatedRobotPose> visionEsts) {
-        for (var est : visionEsts) {
-            Pose2d pose = est.estimatedPose.toPose2d();
-            drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
-        }
-        System.out.println(drivetrain.getPose());
-    }
+    // public void setLocation(List<EstimatedRobotPose> visionEsts) {
+    //     for (var est : visionEsts) {
+    //         Pose2d pose = est.estimatedPose.toPose2d();
+    //         drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
+    //     }
+    //     System.out.println(drivetrain.getPose());
+    // }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,

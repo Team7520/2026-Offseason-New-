@@ -59,8 +59,8 @@ public class Constants {
         public static final double HOOD_ANGLE_RANGE = HOOD_MAX_ANGLE-HOOD_MIN_ANGLE;
         public static final double HOOD_ROTATION_RANGE = HOOD_MAX_ROTATION-HOOD_MIN_ROTATION;
 
-        public static final double TURRET_FORWARD_LIMIT = 0.625;
-        public static final double TURRET_REVERSE_LIMIT = -0.625;
+        public static final double TURRET_FORWARD_LIMIT = 0.695;
+        public static final double TURRET_REVERSE_LIMIT = -0.695;
     }
 
     public static class UniverseConstants {
