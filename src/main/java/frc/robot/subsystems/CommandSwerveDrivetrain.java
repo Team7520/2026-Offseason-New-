@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -258,12 +259,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
+        Matrix<N3, N1> visionStdDevs = VecBuilder.fill(
+            0.1,       // X uncertainty
+            0.1,       // Y uncertainty
+            999999.0   // Rotation uncertainty -> ignore heading
+        );
+
         for (int i = 0 ; i < 4; i++) {
             double captureTime = vision.getCaptureTime(i);
             Pose2d pose = vision.getCurrentRobotFieldPose(i);
             if (pose != null) {
                 Pose2d correctedPose = new Pose2d(pose.getTranslation(), getPigeon2().getRotation2d());
-                addVisionMeasurement(correctedPose, captureTime);
+                addVisionMeasurement(correctedPose, captureTime, visionStdDevs);
             }
         }
 
