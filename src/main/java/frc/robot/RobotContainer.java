@@ -48,8 +48,10 @@ public class RobotContainer {
 
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
+        private final CommandXboxController operator = new CommandXboxController(1);
 
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+
+    private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -60,8 +62,6 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-
-    private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -88,16 +88,13 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-/*
-        dyerotor.setDefaultCommand (
-            dyerotor.intakeDyeAndWheel(-0.1, 0)
-        );
-*/
+
+        // driver commands
 
         driver.rightTrigger().whileTrue(
             new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
@@ -164,6 +161,16 @@ public class RobotContainer {
         // driver.y().whileTrue(
         // new ReverseWheels(dyerotor, -0.9, turret, -0.6)
         // );
+
+        // operator commands
+
+        operator.x().onTrue(
+            drivetrain.resetGyro()
+        );
+
+        operator.y().onTrue(
+            turret.turnHood(-0.1)
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

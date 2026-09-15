@@ -58,7 +58,7 @@ public class IntakeSubsystem extends SubsystemBase {
         extendConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         extendConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder value
         extendConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        extendConfig.CurrentLimits.StatorCurrentLimit = 150; // placeholder value
+        extendConfig.CurrentLimits.StatorCurrentLimit = 70; // placeholder value
 
         extendMotor.getConfigurator().apply(extendConfig);
         extendMotor.setNeutralMode(NeutralModeValue.Brake);

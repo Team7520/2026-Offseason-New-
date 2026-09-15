@@ -231,6 +231,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Command resetGyro() {
+        return runOnce(() -> {
+            seedFieldCentric();
+        }
+    );
+}
+
     @Override
     public void periodic() {
         /*
@@ -255,7 +262,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double captureTime = vision.getCaptureTime(i);
             Pose2d pose = vision.getCurrentRobotFieldPose(i);
             if (pose != null) {
-                addVisionMeasurement(pose, captureTime);
+                Pose2d correctedPose = new Pose2d(pose.getTranslation(), getPigeon2().getRotation2d());
+                addVisionMeasurement(correctedPose, captureTime);
             }
         }
 
