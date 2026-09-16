@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -53,6 +54,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final CANcoder encoder;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionVoltage positionRequest = new PositionVoltage(0);
+    private final VelocityVoltage velocityVoltRequest = new VelocityVoltage(0);
 
     CommandSwerveDrivetrain drive;
 
@@ -108,7 +110,7 @@ public class TurretSubsystem extends SubsystemBase {
         encoder.getConfigurator().apply(cc_cfg);
 
         TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-        azimuthConfig.Slot0.kP = 100;
+        azimuthConfig.Slot0.kP = 20;
         azimuthConfig.Slot0.kI = 0;
         azimuthConfig.Slot0.kD = 0; // placeholder values
 
@@ -211,9 +213,10 @@ public class TurretSubsystem extends SubsystemBase {
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
 
-        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(2 * Math.PI / 3)); // Adjust for turret 120 degree offset angle
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(0.77 * Math.PI)); // Adjust for turret offset angle
     }
-/*
+
+
     public Pose2d predictFuturePose(Pose2d robotPose, double timeOfFlight, double odometryLatency) {
         ChassisSpeeds currentSpeed = drive.getFieldRelativeSpeeds();
         SmartDashboard.putNumber("Current Speed VX", currentSpeed.vxMetersPerSecond);
@@ -224,7 +227,7 @@ public class TurretSubsystem extends SubsystemBase {
             robotPose.getRotation().plus(new Rotation2d(currentSpeed.omegaRadiansPerSecond * odometryLatency))
         );
     }
-*/
+
     public RobotZone getRobotZone() {
         if (!availableAlliance) {
             return RobotZone.NO_ALLIANCE;
@@ -261,7 +264,7 @@ public class TurretSubsystem extends SubsystemBase {
             }
         }
     }
-/*
+
     public Command autoAim() {
         return Commands.run(() -> {
                 if (!override) {
@@ -315,6 +318,7 @@ public class TurretSubsystem extends SubsystemBase {
                         double odometryLatency = 0.1;
 
                         double flightTime = 0.125 * currentDist + 0.665;
+                        currentPose = drive.getPose();
                         currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
 
@@ -353,7 +357,47 @@ public class TurretSubsystem extends SubsystemBase {
             }
         }, this);
     }
-*/
+
+    public Command shootCommand() {
+    return Commands.defer(
+        () -> {
+          if (override) {
+            return Commands.parallel(
+                    Commands.run(
+                        () -> {
+                          setWheels = true;
+                          hoodAdjust = false;
+                        })
+                    )
+                .finallyDo(
+                    () -> {
+                      setWheels = false;
+                      stopFlywheels();
+                    });
+          }
+          RobotZone zone = getRobotZone();
+          if (zone == RobotZone.UNDER_FAR_TRENCH) {
+            return Commands.startEnd(
+                () -> {
+                  hoodAdjust = false;
+                },
+                () -> {});
+          } else {
+            return Commands.run(() -> {
+                setWheels = true;
+                hoodAdjust = true;
+                System.out.println("abcdefghijklmnop");
+            })
+            .finallyDo(() -> {
+                setWheels = false;
+                hoodAdjust = false;
+                System.out.println("1234567890");
+            });
+          }
+        },
+        java.util.Set.of());
+  }
+
     public double getDistance(Pose2d turretPose, Pose2d goalPose) {
         return turretPose.getTranslation().getDistance(goalPose.getTranslation());
     }
@@ -430,6 +474,12 @@ public class TurretSubsystem extends SubsystemBase {
 
     }
 
+    public void setFlywheelVelocity(double rps) {
+        SmartDashboard.putNumber("RPS target", rps);
+        topMotorLeft.setControl(velocityVoltRequest.withVelocity(-rps).withEnableFOC(true));
+        topMotorRight.setControl(velocityVoltRequest.withVelocity(rps).withEnableFOC(true));
+    }
+
     public void spinFlywheels(double speed) {
         topMotorRight.setControl(duty.withOutput(-speed));
         topMotorLeft.setControl(duty.withOutput(speed));
@@ -454,6 +504,22 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorRight.setControl(duty.withOutput(0));
         topMotorLeft.setControl(duty.withOutput(0));
     }
+
+    public void override() {
+        if (!override) {
+            override = true;
+        } else {
+            override = false;
+        }
+    }
+
+    public boolean atTarget(double position) {
+        double current = azimuthMotor.getPosition().getValueAsDouble();
+        double error = Math.abs(position - current);
+        // System.out.print(error);
+        return error < 0.01;
+    }
+
 
     @Override
     public void periodic() {

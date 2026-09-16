@@ -94,11 +94,25 @@ public class RobotContainer {
             )
         );
 
+        // default commands
+
+        // turret.setDefaultCommand (
+        //     new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret)
+        // );
+
+        turret.setDefaultCommand (
+            turret.autoAim()
+        );
+
         // driver commands
 
+        // driver.rightTrigger().whileTrue(
+        //     new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
+        //     turret.shootCommand())
+        // );
+
         driver.rightTrigger().whileTrue(
-            new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
-            new IntakeAgitation(intake))
+            new ShootAndIndex(dyerotor, turret)
         );
 
         driver.leftTrigger().whileTrue(
