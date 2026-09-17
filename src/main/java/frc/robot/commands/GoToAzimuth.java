@@ -16,7 +16,6 @@ public class GoToAzimuth extends Command{
         this.turret = turret;
         this.robotPoseSupplier = robotPoseSupplier;
         this.goal = goal;
-        addRequirements(turret);
     }
 
     @Override

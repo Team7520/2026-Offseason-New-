@@ -17,6 +17,10 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -28,7 +32,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 import choreo.trajectory.SwerveSample;
@@ -79,6 +83,8 @@ public void followPath(SwerveSample sample) {
     );
 }
     Vision vision = new Vision();
+
+    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
@@ -307,11 +313,9 @@ public void followPath(SwerveSample sample) {
         );
 
         for (int i = 0 ; i < 4; i++) {
-            double captureTime = vision.getCaptureTime(i);
-            Pose2d pose = vision.getCurrentRobotFieldPose(i);
-            if (pose != null) {
-                Pose2d correctedPose = new Pose2d(pose.getTranslation(), getPigeon2().getRotation2d());
-                addVisionMeasurement(correctedPose, captureTime, visionStdDevs);
+            for (var measurement : vision.getCurrentRobotFieldMeasurements(i)) {
+                Pose2d correctedPose = new Pose2d(measurement.pose().getTranslation(), getPigeon2().getRotation2d());
+                addVisionMeasurement(correctedPose, measurement.timestampSeconds(), visionStdDevs);
             }
         }
 
@@ -377,4 +381,37 @@ public void followPath(SwerveSample sample) {
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
+
+    /** Returns the measured chassis speeds of the robot. */
+      private ChassisSpeeds getChassisSpeeds() {
+            return kinematics.toChassisSpeeds(getModuleStates());
+    }
+
+    public ChassisSpeeds getFieldRelativeSpeeds() {
+        ChassisSpeeds robotRelative = getChassisSpeeds();
+
+        return ChassisSpeeds.fromRobotRelativeSpeeds(
+            robotRelative.vxMetersPerSecond,
+            robotRelative.vyMetersPerSecond,
+            robotRelative.omegaRadiansPerSecond,
+            getRotation()
+        );
+    }
+
+    private SwerveModuleState[] getModuleStates() {
+        return getState().ModuleStates;
+    }
+
+    public Rotation2d getRotation() {
+        return getPose().getRotation();
+    }
+
+    public static Translation2d[] getModuleTranslations() {
+    return new Translation2d[] {
+      new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+      new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
+      new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+      new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+    };
+  }
 }

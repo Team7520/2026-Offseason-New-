@@ -115,13 +115,13 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
-    public void setLocation(List<EstimatedRobotPose> visionEsts) {
-        for (var est : visionEsts) {
-            Pose2d pose = est.estimatedPose.toPose2d();
-            drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
-        }
-        System.out.println(drivetrain.getPose());
-    }
+    // public void setLocation(List<EstimatedRobotPose> visionEsts) {
+    //     for (var est : visionEsts) {
+    //         Pose2d pose = est.estimatedPose.toPose2d();
+    //         drivetrain.addVisionMeasurement(pose, est.timestampSeconds);
+    //     }
+    //     System.out.println(drivetrain.getPose());
+    // }
 
     private void configureBindings() {
         
@@ -136,11 +136,25 @@ public class RobotContainer {
             )
         );
 
+        // default commands
+
+        // turret.setDefaultCommand (
+        //     new GoToAzimuth(drivetrain::getPose, UniverseConstants.redGoalPose.toPose2d(), turret)
+        // );
+
+        turret.setDefaultCommand (
+            turret.autoAim()
+        );
+
         // driver commands
 
+        // driver.rightTrigger().whileTrue(
+        //     new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
+        //     turret.shootCommand())
+        // );
+
         driver.rightTrigger().whileTrue(
-            new ParallelCommandGroup(new ShootAndIndex(dyerotor, turret),
-            new IntakeAgitation(intake))
+            new ShootAndIndex(dyerotor, turret)
         );
 
         driver.leftTrigger().onTrue(
