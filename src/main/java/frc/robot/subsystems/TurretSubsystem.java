@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -480,11 +481,6 @@ public class TurretSubsystem extends SubsystemBase {
         topMotorRight.setControl(velocityVoltRequest.withVelocity(rps).withEnableFOC(true));
     }
 
-    public void setFlywheelVelocity(double rps) {
-        SmartDashboard.putNumber("RPS target", rps);
-        topMotorLeft.setControl(velocityVoltRequest.withVelocity(-rps).withEnableFOC(true));
-        topMotorRight.setControl(velocityVoltRequest.withVelocity(rps).withEnableFOC(true));
-    }
 
     public void spinFlywheels(double speed) {
         topMotorRight.setControl(duty.withOutput(-speed));
