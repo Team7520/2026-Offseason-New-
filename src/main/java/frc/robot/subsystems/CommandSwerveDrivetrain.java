@@ -70,14 +70,12 @@ public void followPath(SwerveSample sample) {
 
     ChassisSpeeds discretized = ChassisSpeeds.discretize(targetSpeeds, 0.02);
     double headingError = sample.heading - pose.getRotation().getRadians();
-System.out.println("Heading error (rad): " + headingError + " | measured: " + pose.getRotation().getRadians() + " | target: " + sample.heading);
 
     setControl(
         m_pathApplyFieldSpeeds
             .withSpeeds(discretized)
             .withWheelForceFeedforwardsX(sample.moduleForcesX())
             .withWheelForceFeedforwardsY(sample.moduleForcesY())
-            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
     );
 }
     Vision vision = new Vision();

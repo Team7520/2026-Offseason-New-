@@ -453,8 +453,6 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 //        System.out.println("Hood Position: " + hoodMotor.getPosition().getValueAsDouble());
-        System.out.println("Azimuth Motor Position: " + azimuthMotor.getPosition().getValueAsDouble());
-        System.out.println("Encoder Motor Position: " + encoder.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Hood Position", hoodMotor.getPosition().getValueAsDouble());
         if (!availableAlliance) {
             try {

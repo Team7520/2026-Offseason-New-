@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers.IntArraySerializer;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import org.photonvision.EstimatedRobotPose;
 import choreo.Choreo;
@@ -59,6 +60,9 @@ public class RobotContainer {
     //shooting
     final ShootAndIndex shootCommand;
 
+    private final Command intakeCommand;
+
+
 
 
     // Controller
@@ -97,6 +101,10 @@ public class RobotContainer {
         intake = new IntakeSubsystem();
 
         shootCommand = new ShootAndIndex(dyerotor, turret);
+        intakeCommand = Commands.run(() -> {
+            System.out.println("Intake running...");
+            intake.manualExtend(0.5);
+        }, intake);
 
         // Configure the button bindings
         configureBindings();
@@ -244,28 +252,29 @@ public class RobotContainer {
     traj.atTime("IntakeOn").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT TRIGGERED: IntakeOn!");
-            intake.manualExtend(0.5);
-        }, intake)
+            intakeCommand.schedule();
+        })
     );
 
     traj.atTime("IntakeOff").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT TRIGGERED: IntakeOff!");
+            intakeCommand.cancel();
             intake.stopAll();
-        }, intake)
+        })
     );
 
     traj.atTime("ShootOn").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT: Shoot ON");
-            // shootCommand.schedule();
+            shootCommand.schedule();
         })
     );
 
     traj.atTime("ShootOff").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT: Shoot OFF");
-            // shootCommand.cancel();
+            shootCommand.cancel();
         })
     );
 
