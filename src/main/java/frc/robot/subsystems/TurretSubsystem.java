@@ -111,6 +111,18 @@ public class TurretSubsystem extends SubsystemBase {
         return encoder.getPosition().getValueAsDouble();
     }
 
+    public void setTurretAngle(double targetDegrees) {
+        double currentRotations = turretMotor.getPosition().getValueAsDouble();
+        double targetRotations = targetDegrees / 360.0;
+
+        // find the equivalent target closest to current position (shortest path)
+        double delta = targetRotations - currentRotations;
+        delta -= Math.round(delta); // wraps delta into [-0.5, 0.5) rotations
+        double setpoint = currentRotations + delta;
+
+        turretMotor.setControl(new MotionMagicVoltage(setpoint));
+    }
+
     public void setAzimuth(double angle) {
         Rotation2d normalized = Rotation2d.fromDegrees(angle);
         double rotations = normalized.getRotations();
@@ -165,6 +177,8 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        System.out.println("CANcoder abs: " + encoder.getPosition().getValueAsDouble());
+        System.out.println("Talon fused pos: " + azimuthMotor.getPosition().getValueAsDouble());
         System.out.println(azimuthMotor.getPosition().getValueAsDouble());
     }
 }
