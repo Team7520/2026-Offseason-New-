@@ -25,24 +25,27 @@ public class Vision {
 
     AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
+    // CAD +X is robot right, +Y is forward, and +Z is up (millimeters).
+    // WPILib +X is forward, +Y is left, and +Z is up (meters).
+    // Cameras are upside down; negative WPILib pitch points the lens upward.
     private final Transform3d robotToFrontLeft = new Transform3d(
-        new Translation3d(-0.3217183558,0.1713393322,0.5360775664),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(-45))
+        new Translation3d(0.283304215, -0.215717783, 0.536052163),
+        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(45))
     );
 
     private final Transform3d robotToFrontRight = new Transform3d(
-        new Translation3d(0.288096706, 0.2131367848, 0.5360775664),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(45))
+        new Translation3d(0.283311550, -0.346804215, 0.536052163),
+        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-45))
     );
 
     private final Transform3d robotToBackLeft = new Transform3d(
-        new Translation3d(.2162596386, .2823385006, .5360775664),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(-135))
+        new Translation3d(0.170198349, 0.322260216, 0.536052163),
+        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(135))
     );
 
     private final Transform3d robotToBackRight = new Transform3d(
-        new Translation3d(.3452393654, .2823458412, .5360775664),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-23), Units.degreesToRadians(135))
+        new Translation3d(0.211995785, -0.289661550, 0.536052163),
+        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-135))
     );
 
     Transform3d[] robotToCameras = {robotToFrontLeft, robotToFrontRight, robotToBackLeft, robotToBackRight};
