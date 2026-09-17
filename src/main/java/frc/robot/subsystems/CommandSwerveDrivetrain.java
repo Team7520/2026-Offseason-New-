@@ -12,10 +12,17 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -23,7 +30,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -34,6 +41,10 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    Vision vision = new Vision();
+
+    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -49,6 +60,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    StructPublisher<Pose2d> currentPosePublisher =
+      NetworkTableInstance.getDefault().getStructTopic("MyPose", Pose2d.struct).publish();
 
     public Pose2d getPose() {
         return getState().Pose;
@@ -224,6 +238,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    public Command resetGyro() {
+        return runOnce(() -> {
+            seedFieldCentric();
+        }
+    );
+}
+
     @Override
     public void periodic() {
         /*
@@ -243,6 +264,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        Matrix<N3, N1> visionStdDevs = VecBuilder.fill(
+            0.1,       // X uncertainty
+            0.1,       // Y uncertainty
+            999999.0   // Rotation uncertainty -> ignore heading
+        );
+
+        for (int i = 0 ; i < 4; i++) {
+            double captureTime = vision.getCaptureTime(i);
+            Pose2d pose = vision.getCurrentRobotFieldPose(i);
+            if (pose != null) {
+                Pose2d correctedPose = new Pose2d(pose.getTranslation(), getPigeon2().getRotation2d());
+                addVisionMeasurement(correctedPose, captureTime, visionStdDevs);
+            }
+        }
+
+        currentPosePublisher.set(getPose());
     }
 
     private void startSimThread() {
@@ -304,4 +342,37 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
+
+    /** Returns the measured chassis speeds of the robot. */
+      private ChassisSpeeds getChassisSpeeds() {
+            return kinematics.toChassisSpeeds(getModuleStates());
+    }
+
+    public ChassisSpeeds getFieldRelativeSpeeds() {
+        ChassisSpeeds robotRelative = getChassisSpeeds();
+
+        return ChassisSpeeds.fromRobotRelativeSpeeds(
+            robotRelative.vxMetersPerSecond,
+            robotRelative.vyMetersPerSecond,
+            robotRelative.omegaRadiansPerSecond,
+            getRotation()
+        );
+    }
+
+    private SwerveModuleState[] getModuleStates() {
+        return getState().ModuleStates;
+    }
+
+    public Rotation2d getRotation() {
+        return getPose().getRotation();
+    }
+
+    public static Translation2d[] getModuleTranslations() {
+    return new Translation2d[] {
+      new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
+      new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
+      new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
+      new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+    };
+  }
 }
