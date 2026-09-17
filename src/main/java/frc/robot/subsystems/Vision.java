@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -59,25 +58,21 @@ public class Vision {
     
     private final PhotonPoseEstimator frontLeftEstimator = new PhotonPoseEstimator(
         fieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToFrontLeft
     );
 
     private final PhotonPoseEstimator frontRightEstimator = new PhotonPoseEstimator(
         fieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToFrontRight
     );
 
     private final PhotonPoseEstimator backLeftEstimator = new PhotonPoseEstimator(
         fieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToBackLeft
     );
 
     private final PhotonPoseEstimator backRightEstimator = new PhotonPoseEstimator(
         fieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToBackRight
     );
 
@@ -103,35 +98,34 @@ public class Vision {
         return visionEsts;
     }
 
-    public double getCaptureTime(int index) {
-        PhotonPipelineResult result;
-        result = cameras[index].getLatestResult();
-        return result.getTimestampSeconds();
-  }
+    public record VisionMeasurement(Pose2d pose, double timestampSeconds) {}
 
-    private PhotonPipelineResult getLatestCameraResult(PhotonCamera camera) {
-        List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-        if (results.isEmpty()) {
-            return new PhotonPipelineResult();
-        }
-        return results.get(results.size() - 1);
+    public List<VisionMeasurement> getCurrentRobotFieldMeasurements(int index) {
+        return estimateRobotFieldMeasurements(
+            cameras[index].getAllUnreadResults(), fieldLayout, robotToCameras[index]);
     }
 
-    public Pose2d getCurrentRobotFieldPose(int index) {
-        PhotonPipelineResult result = null;
-        result = getLatestCameraResult(cameras[index]);
-        Transform3d robotToCamera = robotToCameras[index];
-        PhotonTrackedTarget target = result.getBestTarget();
-        if (target != null) {
+    static List<VisionMeasurement> estimateRobotFieldMeasurements(
+            List<PhotonPipelineResult> results, AprilTagFieldLayout fieldLayout, Transform3d robotToCamera) {
+        List<VisionMeasurement> measurements = new ArrayList<>();
+        for (PhotonPipelineResult result : results) {
+            if (!result.hasTargets()) {
+                continue;
+            }
+            PhotonTrackedTarget target = result.getBestTarget();
+            Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
+            if (tagPose.isEmpty()) {
+                continue;
+            }
             Pose3d robotPose =
                 PhotonUtils.estimateFieldToRobotAprilTag(
-                target.getBestCameraToTarget(),
-                fieldLayout.getTagPose(target.getFiducialId()).get(),
-                robotToCamera.inverse());
-            return robotPose.toPose2d();
-        } else {
-            return null;
+                    target.getBestCameraToTarget(),
+                    tagPose.get(),
+                    robotToCamera.inverse());
+            // Keep the capture timestamp paired with the frame used to estimate the pose.
+            measurements.add(new VisionMeasurement(robotPose.toPose2d(), result.getTimestampSeconds()));
         }
+        return measurements;
     }
 
     // public void GoToAzimuth2() {
