@@ -441,7 +441,7 @@ public class TurretSubsystem extends SubsystemBase {
     public double getAzimuth() {
         return encoder.getPosition().getValueAsDouble();
     }
-
+/*
     public void setTurretAngle(double targetDegrees) {
         double currentRotations = turretMotor.getPosition().getValueAsDouble();
         double targetRotations = targetDegrees / 360.0;
@@ -453,7 +453,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretMotor.setControl(new MotionMagicVoltage(setpoint));
     }
-
+*/
     public void setAzimuth(double angle) {
         Rotation2d normalized = Rotation2d.fromDegrees(angle);
         double rotations = normalized.getRotations();

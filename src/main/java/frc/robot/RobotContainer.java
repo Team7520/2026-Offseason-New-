@@ -173,7 +173,7 @@ public class RobotContainer {
 
 // Final y command: reverse shooter and dye wheels
         // driver.y().whileTrue(
-        // new ReverseWheels(dyerotor, -0.9, turret, -0.6)
+        // new ReverseWheels(dyerotor, -0.3, turret, -0.5)
         // );
 
         // operator commands
@@ -182,8 +182,12 @@ public class RobotContainer {
             drivetrain.resetGyro()
         );
 
-        operator.y().onTrue(
+        operator.y().whileTrue(
             turret.turnHood(-0.1)
+        );
+
+        operator.b().onTrue(
+            new InstantCommand(() -> dyerotor.toggleReverseDye())
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);

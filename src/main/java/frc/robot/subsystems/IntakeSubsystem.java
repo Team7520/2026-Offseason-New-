@@ -134,11 +134,19 @@ public class IntakeSubsystem extends SubsystemBase {
     // EXTEND/RETRACT functions
 
     public void manualExtend(double speed) {
+        if (shotBlockUp == true) {
+            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
+            shotBlockUp = false;
+        }
         SmartDashboard.putNumber("Intake", extendMotor.getPosition().getValueAsDouble());
         extendMotor.setControl(duty.withOutput(speed));
     }
 
     public void extend() {
+        if (shotBlockUp == true) {
+            blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
+            shotBlockUp = false;
+        }
         if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
             extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND).withEnableFOC(true));
         }
@@ -244,7 +252,7 @@ public class IntakeSubsystem extends SubsystemBase {
 //        System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
-        
+
         if (shotBlockUp && extendMotor.getPosition().getValueAsDouble() < -1) {
             retractWithSpeed(-0.3);
         }

@@ -14,6 +14,7 @@ public class DyerotorSubsystem extends SubsystemBase {
     private final TalonFX rotateMotor;
     private final TalonFX wheelMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
+    boolean reverseDye = false;
 
     public DyerotorSubsystem() {
         rotateMotor = new TalonFX(DyeConstants.DYE_ROTATE_MOTOR_ID);
@@ -57,6 +58,14 @@ public class DyerotorSubsystem extends SubsystemBase {
         wheelMotor.setControl(duty.withOutput(-speed2));
     }
 
+    public void toggleReverseDye() {
+        if (reverseDye == false) {
+            reverseDye = true;
+        } else {
+            reverseDye = false;
+        }
+    }
+
     public Command intakeDyeAndWheel(double speed1, double speed2) {
         return Commands.run(() -> spinDyeAndWheel(speed1, speed2), this);
     }
@@ -64,5 +73,14 @@ public class DyerotorSubsystem extends SubsystemBase {
     public void stopAll() {
         rotateMotor.setControl(duty.withOutput(0));
         wheelMotor.setControl(duty.withOutput(0));
+    }
+
+    public void periodic() {
+        if (reverseDye) {
+            spinDye(-0.1);
+            spinWheel(-0.3);
+        } else {
+            stopAll();
+        }
     }
 }
