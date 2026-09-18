@@ -101,14 +101,14 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
     }
 
+    public void manualBlocker(double speed) {
+        blockerMotor.setControl(duty.withOutput(speed));
+    }
+
     public boolean blockerAtTarget(double position) {
         double current = blockerMotor.getPosition().getValueAsDouble();
         double error = Math.abs(position - current);
         return error < 0.1;
-    }
-
-    public Command blockerManual(double power) {
-        return Commands.runOnce(() -> blockerMotor.set(power), this);
     }
 
     public Command blockerToggle() {
@@ -122,10 +122,6 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotorRight.setControl(duty.withOutput(-speed));
     }
 
-    public void stopIntake() {
-        intakeMotorLeft.setControl(duty.withOutput(0));
-        intakeMotorRight.setControl(duty.withOutput(0));
-    }
 /*
     public void shotBlocker(double speed) {
         blockerMotor.setControl(duty.withOutput(speed));
@@ -247,9 +243,19 @@ public class IntakeSubsystem extends SubsystemBase {
         extendMotor.setControl(duty.withOutput(0));
     }
 
+    public void stopBlocker() {
+        blockerMotor.setControl(duty.withOutput(0));
+    }
+
+    public void stopIntake() {
+        intakeMotorLeft.setControl(duty.withOutput(0));
+        intakeMotorRight.setControl(duty.withOutput(0));
+    }
+
     @Override
     public void periodic() {
-//        System.out.println("Position: " + extendMotor.getPosition().getValueAsDouble());
+//        System.out.println("Extend position: " + extendMotor.getPosition().getValueAsDouble());
+//        System.out.println("Blocker position: " + blockerMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
 
