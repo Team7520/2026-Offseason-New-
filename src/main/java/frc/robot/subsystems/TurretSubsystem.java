@@ -241,10 +241,13 @@ public class TurretSubsystem extends SubsystemBase {
         Pose2d turretPose = getTurretPose();
         double xPosition = turretPose.getX();
         double yPosition = turretPose.getY();
+        double xRobotPosition = drive.getPose().getX();
 
         if (alliance == Alliance.Red) {
             // RED ALLIANCE
-            if (xPosition <= 6 && xPosition >= 3.7) {
+            if (xPosition <= 13 && xPosition >= 11) {
+                return RobotZone.UNDER_FAR_TRENCH;
+            } else if (xRobotPosition <= 13 && xRobotPosition >= 11) {
                 return RobotZone.UNDER_FAR_TRENCH;
             } else if (xPosition <= 11) {
                 if (yPosition >= UniverseConstants.fieldWidthMidpoint) {
@@ -257,7 +260,9 @@ public class TurretSubsystem extends SubsystemBase {
             }
         } else {
             // BLUE ALLIANCE
-            if (xPosition <= 12.7 && xPosition >= 11) {
+            if (xPosition <= 5.5 && xPosition >= 3.7) {
+                return RobotZone.UNDER_FAR_TRENCH;
+            } else if (xRobotPosition <= 5.5 && xRobotPosition >= 3.7) {
                 return RobotZone.UNDER_FAR_TRENCH;
             } else if (xPosition >= 6) {
                 if (yPosition >= UniverseConstants.fieldWidthMidpoint) {
@@ -353,6 +358,7 @@ public class TurretSubsystem extends SubsystemBase {
                     case UNDER_FAR_TRENCH:
                         {
                             setHoodAngle(TurretConstants.HOOD_MIN_ANGLE);
+                            stopFlywheels();
                             break;
                         }
                     case NO_ALLIANCE:
