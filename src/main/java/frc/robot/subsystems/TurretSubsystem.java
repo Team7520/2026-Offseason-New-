@@ -85,8 +85,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         // SmartDashboard.setDefaultNumber("Hood scaleFactor", 20.0);
         // SmartDashboard.setDefaultNumber("Hood con", 10.0);
-        // SmartDashboard.setDefaultNumber("Flywheel b", 0.4);
-        // SmartDashboard.setDefaultNumber("Flywheel rpsPerDistance", 0.05);
+        SmartDashboard.setDefaultNumber("Flywheel b", 24);
+        SmartDashboard.setDefaultNumber("Flywheel rpsPerDistance", 7);
 
         topMotorLeft = new TalonFX(TurretConstants.TOP_MOTOR_ID_LEFT);
         topMotorRight = new TalonFX(TurretConstants.TOP_MOTOR_ID_RIGHT);
@@ -95,9 +95,10 @@ public class TurretSubsystem extends SubsystemBase {
         encoder = new CANcoder(55);
 
         TalonFXConfiguration topConfig = new TalonFXConfiguration();
-        topConfig.Slot0.kP = 0.045 * 12 *0;
+        topConfig.Slot0.kP = 0.045 * 12;
         topConfig.Slot0.kI = 0;
-        topConfig.Slot0.kD = 0.0115 * 12*0;
+        topConfig.Slot0.kD = 0;
+        topConfig.Slot0.kV = 0.0115 * 12;
         topConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         topConfig.CurrentLimits.StatorCurrentLimit = 100;
         topConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -124,9 +125,9 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 40;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 80;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder values
+        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 50; // placeholder values
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
@@ -332,7 +333,8 @@ public class TurretSubsystem extends SubsystemBase {
                         setTurretAzimuth(turretAngle);
 
                         if (setWheels) {
-                            spinFlywheels(getSpeedFromDistance(updatingCurrentDist, far));
+                            System.out.println(getSpeedFromDistance(updatingCurrentDist, far));
+                            setFlywheelVelocity(getSpeedFromDistance(updatingCurrentDist, far));
                         } else {
                             stopFlywheels();
                         }
@@ -424,20 +426,20 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getSpeedFromDistance(double distance, boolean far) {
         if (far) {
-            distance += 0.2;
+            distance += 2;
         }
-        //double b = SmartDashboard.getNumber("Flywheel b", 0.4);
-     // 3.35
-        //double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 0.05);
-        double rpsPerDistance = 0.08;
-        double b = 0.4;
+        double b = SmartDashboard.getNumber("Flywheel b", 24);
+     //3.35
+        double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
+        // double rpsPerDistance = 0.08;
+        // double b = 0.4;
         double speed = rpsPerDistance * distance + b;
 
         // for testing
         // double speed = 36.0;
 
-        if (speed > 0.9) {
-            speed = 0.9;
+        if (speed > 100) {
+            speed = 100;
         }
         return speed;
     }
