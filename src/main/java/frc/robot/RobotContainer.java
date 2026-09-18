@@ -41,6 +41,8 @@ import frc.robot.subsystems.DyerotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem; 
 
 public class RobotContainer {
+    private double speedCutoff = 1;
+    private double turnCutoff = 0.7;
     // Subsystems
     private final TurretSubsystem turret;
     private final DyerotorSubsystem dyerotor;
@@ -51,7 +53,7 @@ public class RobotContainer {
         private final CommandXboxController operator = new CommandXboxController(1);
 
 
-    private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 0.8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -88,10 +90,11 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(driver.getLeftY() * MaxSpeed *speedCutoff) // Drive forward with negative Y (forward)
+                    .withVelocityY(driver.getLeftX() * MaxSpeed *speedCutoff) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getRightX() * MaxAngularRate*turnCutoff) // Drive counterclockwise with negative X (left)
             )
+            
         );
 
         // default commands
@@ -115,6 +118,22 @@ public class RobotContainer {
             new ShootAndIndex(dyerotor, turret)
         );
 
+        driver
+        .rightTrigger()
+        .whileTrue(turret.shootCommand())
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  turnCutoff = turret.turnCutOff();
+                  speedCutoff = turret.speedCutoff();
+                }))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  turnCutoff = 0.7;
+                  speedCutoff = 1;
+                }));
+        
         driver.leftTrigger().whileTrue(
             new ExtendAndRunIntake(intake, 0.9)
         );
@@ -182,8 +201,8 @@ public class RobotContainer {
             drivetrain.resetGyro()
         );
 
-        operator.y().onTrue(
-            turret.turnHood(-0.1)
+        operator.y().whileTrue(
+            turret.turnHood(-0.1).finallyDo(() -> turret.hood(0))
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);
