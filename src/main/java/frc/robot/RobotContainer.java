@@ -187,6 +187,7 @@ public class RobotContainer {
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);
+        turret.setDefaultCommand(turret.autoAim());
     }
 
     public Command getAutonomousCommand() {
