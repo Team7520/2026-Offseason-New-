@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final PositionDutyCycle pos = new PositionDutyCycle(0);
     private final double CURRENT_THRESHOLD = -20; // placeholder value
     private final PositionVoltage positionRequest = new PositionVoltage(0);
-    boolean current = false;
+    boolean shotBlockUp = false;
 
     public IntakeSubsystem() {
         intakeMotorLeft = new TalonFX(IntakeConstants.INTAKE_MOTOR_LEFT_ID);
@@ -83,12 +83,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setBlocker() {
         if (extendMotor.getPosition().getValueAsDouble() > -1) {
-            if (current == false) {
+            if (shotBlockUp == false) {
                 blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
-                current = true;
+                shotBlockUp = true;
             } else {
                 blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
-                current = false;
+                shotBlockUp = false;
             }
         }
     }
@@ -245,5 +245,8 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
         
+        if (shotBlockUp && extendMotor.getPosition().getValueAsDouble() < -1) {
+            retractWithSpeed(-0.3);
+        }
     }
 }
