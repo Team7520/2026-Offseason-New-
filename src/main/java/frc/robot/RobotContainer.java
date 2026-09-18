@@ -141,13 +141,18 @@ public class RobotContainer {
         driver.rightBumper().whileTrue(
             intake.spinRoller(-0.9)
         ).onFalse(
-            new InstantCommand(() -> intake.stopAll()) 
+            new InstantCommand(() -> intake.stopIntake()) 
         );
 
         driver.leftBumper().whileTrue(
             new RetractIntake(intake, 0.3)
         ).onFalse(
             new InstantCommand(() -> intake.stopAll())
+        );
+
+        driver.rightStick().onTrue(
+            intake.blockerToggle())
+        .onFalse(new InstantCommand(turret::stopAll)
         );
 
         driver.x().whileTrue(
@@ -169,7 +174,7 @@ public class RobotContainer {
         driver.povDown().whileTrue(
             intake.spinRoller(0.9))
         .onFalse(
-            new InstantCommand(() -> intake.stopAll())
+            new InstantCommand(() -> intake.stopIntake())
         );
 
         driver.povLeft().whileTrue(
@@ -192,7 +197,7 @@ public class RobotContainer {
 
 // Final y command: reverse shooter and dye wheels
         // driver.y().whileTrue(
-        // new ReverseWheels(dyerotor, -0.9, turret, -0.6)
+        // new ReverseWheels(dyerotor, -0.3, turret, -0.5)
         // );
 
         // operator commands
@@ -205,7 +210,18 @@ public class RobotContainer {
             turret.turnHood(-0.1).finallyDo(() -> turret.hood(0))
         );
 
+        operator.b().onTrue(
+            new InstantCommand(() -> dyerotor.toggleReverseDye())
+        );
+
+        operator.a().whileTrue(
+            new InstantCommand(() -> intake.manualBlocker(0.1))
+        ).onFalse(
+            new InstantCommand(() -> intake.stopBlocker())
+        );
+
         drivetrain.registerTelemetry(logger::telemeterize);
+        turret.setDefaultCommand(turret.autoAim());
     }
 
     public Command getAutonomousCommand() {
