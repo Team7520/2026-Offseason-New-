@@ -291,7 +291,8 @@ public class RobotContainer {
     AutoTrajectory traj = routine.trajectory(trajectoryName);
 
     routine.active().onTrue(
-        traj.resetOdometry().andThen(traj.cmd())
+        Commands.waitSeconds(1.5).andThen(traj.resetOdometry().andThen(traj.cmd()))
+
     );
 
     traj.atTime("IntakeOn").onTrue(
@@ -328,7 +329,6 @@ public class RobotContainer {
     return routine.cmd();
 }
 public Command getAutonomousCommand() {
-    Commands.waitSeconds(1.5);
     return autoChooser.getSelected();
 }
 
