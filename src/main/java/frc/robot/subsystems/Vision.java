@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -29,22 +30,22 @@ public class Vision {
     // Cameras are upside down; negative WPILib pitch points the lens upward.
     private final Transform3d robotToFrontLeft = new Transform3d(
         new Translation3d(0.283304215, -0.215717783, 0.536052163),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(45))
+        new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.117007), Units.degreesToRadians(45))
     );
 
     private final Transform3d robotToFrontRight = new Transform3d(
         new Translation3d(0.283311550, -0.346804215, 0.536052163),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-45))
+        new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-45))
     );
 
     private final Transform3d robotToBackLeft = new Transform3d(
         new Translation3d(0.170198349, 0.322260216, 0.536052163),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(135))
+        new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.117007), Units.degreesToRadians(135))
     );
 
     private final Transform3d robotToBackRight = new Transform3d(
         new Translation3d(0.211995785, -0.289661550, 0.536052163),
-        new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-135))
+        new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.117007), Units.degreesToRadians(-135))
     );
 
     Transform3d[] robotToCameras = {robotToFrontLeft, robotToFrontRight, robotToBackLeft, robotToBackRight};
@@ -55,24 +56,31 @@ public class Vision {
     PhotonCamera backRight = new PhotonCamera("backRight");
 
     PhotonCamera[] cameras = {frontLeft, frontRight, backLeft, backRight};
+
+    // Temporarily disable frontRight and backLeft. Set their entries to true to re-enable.
+    private final boolean[] cameraEnabled = {true, true, true, true};
     
     private final PhotonPoseEstimator frontLeftEstimator = new PhotonPoseEstimator(
         fieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToFrontLeft
     );
 
     private final PhotonPoseEstimator frontRightEstimator = new PhotonPoseEstimator(
         fieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToFrontRight
     );
 
     private final PhotonPoseEstimator backLeftEstimator = new PhotonPoseEstimator(
         fieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToBackLeft
     );
 
     private final PhotonPoseEstimator backRightEstimator = new PhotonPoseEstimator(
         fieldLayout,
+        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         robotToBackRight
     );
 
@@ -84,6 +92,9 @@ public class Vision {
         List<EstimatedRobotPose> visionEsts = new ArrayList<>();
         
         for (int i = 0; i < cameras.length; i++) {
+            if (!cameraEnabled[i]) {
+                continue;
+            }
             PhotonCamera camera = cameras[i];
             PhotonPoseEstimator estimator = estimators[i];
             
@@ -98,34 +109,41 @@ public class Vision {
         return visionEsts;
     }
 
-    public record VisionMeasurement(Pose2d pose, double timestampSeconds) {}
+    public double getCaptureTime(int index) {
+        if (!cameraEnabled[index]) {
+            return 0.0;
+        }
+        PhotonPipelineResult result;
+        result = cameras[index].getLatestResult();
+        return result.getTimestampSeconds();
+  }
 
-    public List<VisionMeasurement> getCurrentRobotFieldMeasurements(int index) {
-        return estimateRobotFieldMeasurements(
-            cameras[index].getAllUnreadResults(), fieldLayout, robotToCameras[index]);
+    private PhotonPipelineResult getLatestCameraResult(PhotonCamera camera) {
+        List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+        if (results.isEmpty()) {
+            return new PhotonPipelineResult();
+        }
+        return results.get(results.size() - 1);
     }
 
-    static List<VisionMeasurement> estimateRobotFieldMeasurements(
-            List<PhotonPipelineResult> results, AprilTagFieldLayout fieldLayout, Transform3d robotToCamera) {
-        List<VisionMeasurement> measurements = new ArrayList<>();
-        for (PhotonPipelineResult result : results) {
-            if (!result.hasTargets()) {
-                continue;
-            }
-            PhotonTrackedTarget target = result.getBestTarget();
-            Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
-            if (tagPose.isEmpty()) {
-                continue;
-            }
+    public Pose2d getCurrentRobotFieldPose(int index) {
+        if (!cameraEnabled[index]) {
+            return null;
+        }
+        PhotonPipelineResult result = null;
+        result = getLatestCameraResult(cameras[index]);
+        Transform3d robotToCamera = robotToCameras[index];
+        PhotonTrackedTarget target = result.getBestTarget();
+        if (target != null) {
             Pose3d robotPose =
                 PhotonUtils.estimateFieldToRobotAprilTag(
-                    target.getBestCameraToTarget(),
-                    tagPose.get(),
-                    robotToCamera.inverse());
-            // Keep the capture timestamp paired with the frame used to estimate the pose.
-            measurements.add(new VisionMeasurement(robotPose.toPose2d(), result.getTimestampSeconds()));
+                target.getBestCameraToTarget(),
+                fieldLayout.getTagPose(target.getFiducialId()).get(),
+                robotToCamera.inverse());
+            return robotPose.toPose2d();
+        } else {
+            return null;
         }
-        return measurements;
     }
 
     // public void GoToAzimuth2() {

@@ -313,9 +313,11 @@ public void followPath(SwerveSample sample) {
         );
 
         for (int i = 0 ; i < 4; i++) {
-            for (var measurement : vision.getCurrentRobotFieldMeasurements(i)) {
-                Pose2d correctedPose = new Pose2d(measurement.pose().getTranslation(), getPigeon2().getRotation2d());
-                addVisionMeasurement(correctedPose, measurement.timestampSeconds(), visionStdDevs);
+            double captureTime = vision.getCaptureTime(i);
+            Pose2d pose = vision.getCurrentRobotFieldPose(i);
+            if (pose != null) {
+                Pose2d correctedPose = new Pose2d(pose.getTranslation(), getPigeon2().getRotation2d());
+                addVisionMeasurement(correctedPose, captureTime, visionStdDevs);
             }
         }
 

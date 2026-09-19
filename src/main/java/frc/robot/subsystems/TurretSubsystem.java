@@ -85,6 +85,11 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(CommandSwerveDrivetrain drive) {
         this.drive = drive;
 
+        // SmartDashboard.setDefaultNumber("Hood scaleFactor", 20.0);
+        // SmartDashboard.setDefaultNumber("Hood con", 10.0);
+        SmartDashboard.setDefaultNumber("Flywheel b", 24);
+        SmartDashboard.setDefaultNumber("Flywheel rpsPerDistance", 7);
+
         topMotorLeft = new TalonFX(TurretConstants.TOP_MOTOR_ID_LEFT);
         topMotorRight = new TalonFX(TurretConstants.TOP_MOTOR_ID_RIGHT);
         hoodMotor = new TalonFX(TurretConstants.HOOD_MOTOR_ID);
@@ -92,9 +97,10 @@ public class TurretSubsystem extends SubsystemBase {
         encoder = new CANcoder(55);
 
         TalonFXConfiguration topConfig = new TalonFXConfiguration();
-        topConfig.Slot0.kP = 0;
+        topConfig.Slot0.kP = 0.045 * 12;
         topConfig.Slot0.kI = 0;
-        topConfig.Slot0.kD = 0; // placeholder values
+        topConfig.Slot0.kD = 0;
+        topConfig.Slot0.kV = 0.0115 * 12;
         topConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         topConfig.CurrentLimits.StatorCurrentLimit = 100;
         topConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -112,7 +118,7 @@ public class TurretSubsystem extends SubsystemBase {
         encoder.getConfigurator().apply(cc_cfg);
 
         TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-        azimuthConfig.Slot0.kP = 20;
+        azimuthConfig.Slot0.kP = 50;
         azimuthConfig.Slot0.kI = 0;
         azimuthConfig.Slot0.kD = 0; // placeholder values
 
@@ -121,9 +127,9 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 40;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 80;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 20; // placeholder values
+        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 50; // placeholder values
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
@@ -329,6 +335,7 @@ public class TurretSubsystem extends SubsystemBase {
                         setTurretAzimuth(turretAngle);
 
                         if (setWheels) {
+                            System.out.println(getSpeedFromDistance(updatingCurrentDist, far));
                             setFlywheelVelocity(getSpeedFromDistance(updatingCurrentDist, far));
                         } else {
                             stopFlywheels();
@@ -337,7 +344,7 @@ public class TurretSubsystem extends SubsystemBase {
                         if (hoodAdjust && !override) {
                             setHoodAngle(updatingHoodPos);
                         } else {
-                            setHoodAngle(1);
+                            setHoodAngle(TurretConstants.HOOD_MIN_ANGLE);
                         }
 
                         SmartDashboard.putNumber("Distance to target", currentDist);
@@ -347,7 +354,7 @@ public class TurretSubsystem extends SubsystemBase {
                     }
                     case UNDER_FAR_TRENCH:
                         {
-                            setHoodAngle(1);
+                            setHoodAngle(TurretConstants.HOOD_MIN_ANGLE);
                             break;
                         }
                     case NO_ALLIANCE:
@@ -412,26 +419,29 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 3;
         }
-        double scaleFactor = 0.5833;
+        double scaleFactor = 10;//SmartDashboard.getNumber("Hood scaleFactor", 20.0);
+        double con = 10;// SmartDashboard.getNumber("Hood con", 10.0);
 
-        double hoodPos = (distance - 2.0) * scaleFactor;
+        double hoodPos = (distance - 1) * scaleFactor + con;
         return hoodPos;
     }
 
     public double getSpeedFromDistance(double distance, boolean far) {
         if (far) {
-            distance += 3;
+            distance += 2;
         }
-        double b = 23.67;
-     // 3.35
-        double rpsPerDistance = 3.3;
+        double b = SmartDashboard.getNumber("Flywheel b", 24);
+     //3.35
+        double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
+        // double rpsPerDistance = 0.08;
+        // double b = 0.4;
         double speed = rpsPerDistance * distance + b;
 
         // for testing
         // double speed = 36.0;
 
-        if (speed > 75.0) {
-            speed = 75.0;
+        if (speed > 100) {
+            speed = 100;
         }
         return speed;
     }
@@ -443,7 +453,36 @@ public class TurretSubsystem extends SubsystemBase {
     public double getAzimuth() {
         return encoder.getPosition().getValueAsDouble();
     }
+    public double speedCutoff() {
+    RobotZone zone = getRobotZone();
+    if (zone == RobotZone.SHOOTING) {
+      return 0.4;
+    } else {
+      return 1;
+    }
+  }
 
+  public double turnCutOff() {
+    RobotZone zone = getRobotZone();
+    if (zone == RobotZone.SHOOTING) {
+      return 0.4;
+    } else {
+      return 0.7;
+    }
+  }
+/*
+    public void setTurretAngle(double targetDegrees) {
+        double currentRotations = turretMotor.getPosition().getValueAsDouble();
+        double targetRotations = targetDegrees / 360.0;
+
+        // find the equivalent target closest to current position (shortest path)
+        double delta = targetRotations - currentRotations;
+        delta -= Math.round(delta); // wraps delta into [-0.5, 0.5) rotations
+        double setpoint = currentRotations + delta;
+
+        turretMotor.setControl(new MotionMagicVoltage(setpoint));
+    }
+*/
     public void setAzimuth(double angle) {
         Rotation2d normalized = Rotation2d.fromDegrees(angle);
         double rotations = normalized.getRotations();
@@ -466,19 +505,22 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        //if (angle < TurretConstants.HOOD_MIN_ANGLE || angle > TurretConstants.HOOD_MAX_ANGLE) return;
+        angle = MathUtil.clamp(angle, TurretConstants.HOOD_MIN_ANGLE, TurretConstants.HOOD_MAX_ANGLE);
 
         double normalized = (angle - TurretConstants.HOOD_MIN_ANGLE) / TurretConstants.HOOD_ANGLE_RANGE;
         double toRotations = TurretConstants.HOOD_MIN_ROTATION + normalized * TurretConstants.HOOD_ROTATION_RANGE;
 
-        hoodMotor.setControl(positionRequest.withPosition(toRotations));
+        SmartDashboard.putNumber("Hood Target Angle", angle);
+        SmartDashboard.putNumber("Hood Target Rotations", toRotations);
+        var status = hoodMotor.setControl(positionRequest.withPosition(toRotations));
+        SmartDashboard.putString("Hood Control Status", status.toString());
 
     }
 
     public void setFlywheelVelocity(double rps) {
         SmartDashboard.putNumber("RPS target", rps);
-        topMotorLeft.setControl(velocityVoltRequest.withVelocity(-rps).withEnableFOC(true));
-        topMotorRight.setControl(velocityVoltRequest.withVelocity(rps).withEnableFOC(true));
+        topMotorLeft.setControl(velocityVoltRequest.withVelocity(rps).withEnableFOC(true));
+        topMotorRight.setControl(velocityVoltRequest.withVelocity(-rps).withEnableFOC(true));
     }
 
 
@@ -529,6 +571,16 @@ public class TurretSubsystem extends SubsystemBase {
 //        System.out.println("Azimuth Motor Position: " + azimuthMotor.getPosition().getValueAsDouble());
 //        System.out.println("Encoder Motor Position: " + encoder.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Hood Position", hoodMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putBoolean("Hood Adjustment Requested", hoodAdjust);
+        SmartDashboard.putString("Robot Zone", getRobotZone().toString());
+        SmartDashboard.putNumber("Flywheel Left RPS", topMotorLeft.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Flywheel Right RPS", topMotorRight.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Flywheel Left Voltage", topMotorLeft.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Flywheel Right Voltage", topMotorRight.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putBoolean("Shooting Requested", setWheels);
+        SmartDashboard.putBoolean("Auto Aim Running", getCurrentCommand() != null
+            && getCurrentCommand() == getDefaultCommand());
         if (!availableAlliance) {
             try {
                 if (DriverStation.getAlliance().get() == Alliance.Red) {

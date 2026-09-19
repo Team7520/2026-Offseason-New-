@@ -22,9 +22,9 @@ public class ShootAndIndex extends Command {
 
   @Override
   public void execute() {
-    turret.setHoodAngle(35);
+    //turret.setHoodAngle(35);
 //    turret.setAzimuth(0);
-    turret.spinFlywheels(0.6);
+    //turret.spinFlywheels(0.6);
     if (timer.hasElapsed(0.3)) {
       dyerotor.spinWheel(0.9);
     }
@@ -35,9 +35,10 @@ public class ShootAndIndex extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    dyerotor.spinDyeAndWheel(0, 0);
-    turret.spinFlywheels(0);
-    turret.setHoodAngle(0);
+    dyerotor.spinWheel(0);
+    dyerotor.spinDye(0);
+    // turret.spinFlywheels(0);
+    // turret.setHoodAngle(0);
     timer.stop();
     timer.reset();
   }
