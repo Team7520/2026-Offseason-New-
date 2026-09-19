@@ -54,7 +54,7 @@ public class RobotContainer {
         private final CommandXboxController operator = new CommandXboxController(1);
 
 
-    private double MaxSpeed = 0.8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -119,21 +119,21 @@ public class RobotContainer {
             new ShootAndIndex(dyerotor, turret)
         );
 
-        driver
-        .rightTrigger()
-        .whileTrue(turret.shootCommand())
-        .onTrue(
+        driver.rightTrigger().whileTrue(
+            turret.shootCommand()
+        ).onTrue(
             new InstantCommand(
                 () -> {
                   turnCutoff = turret.turnCutOff();
                   speedCutoff = turret.speedCutoff();
-                }))
-        .onFalse(
+                })
+        ).onFalse(
             new InstantCommand(
                 () -> {
                   turnCutoff = 0.7;
                   speedCutoff = 1;
-                }));
+                })
+        );
         
         driver.leftTrigger().whileTrue(
             new ExtendAndRunIntake(intake, 0.9)
