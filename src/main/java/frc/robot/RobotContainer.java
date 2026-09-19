@@ -111,6 +111,7 @@ public class RobotContainer {
         configureBindings();
         autoChooser.setDefaultOption("Double Swipe Top", buildAuto("DoubleSwipeTop"));
         autoChooser.addOption("Double Swipe Bottom", buildAuto("DoubleSwipeBottom"));
+        autoChooser.addOption("8ball", buildAuto("Sneaky8Ball"));
         autoChooser.addOption("Do Nothing", Commands.none());
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
