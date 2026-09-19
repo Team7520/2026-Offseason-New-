@@ -32,7 +32,7 @@ public class Constants {
         public static final double INTAKE_AGITATE_POS = -3;
 
 
-        public static final double BLOCKER_EXTEND = -27.5;
+        public static final double BLOCKER_EXTEND = -26.5;
         public static final double BLOCKER_RETRACT = 0;
     }
 

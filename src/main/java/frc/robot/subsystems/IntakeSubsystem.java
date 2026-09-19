@@ -256,6 +256,11 @@ public class IntakeSubsystem extends SubsystemBase {
         blockerMotor.setControl(duty.withOutput(0));
     }
 
+    public void resetBlocker() {
+        blockerMotor.setControl(duty.withOutput(0));
+        blockerMotor.setPosition(0);
+    }
+
     public void stopIntake() {
         intakeMotorLeft.setControl(duty.withOutput(0));
         intakeMotorRight.setControl(duty.withOutput(0));

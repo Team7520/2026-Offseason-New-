@@ -201,12 +201,12 @@ public class RobotContainer {
 
         // operator commands
 
-        operator.x().onTrue(
-            drivetrain.resetGyro()
+        operator.rightTrigger().whileTrue(
+            turret.turnHood(-0.1).finallyDo(() -> turret.hood(0))
         );
 
-        operator.y().whileTrue(
-            turret.turnHood(-0.1).finallyDo(() -> turret.hood(0))
+        operator.x().onTrue(
+            drivetrain.resetGyro()
         );
 
         operator.b().onTrue(
@@ -216,7 +216,13 @@ public class RobotContainer {
         operator.a().whileTrue(
             new InstantCommand(() -> intake.manualBlocker(0.1))
         ).onFalse(
-            new InstantCommand(() -> intake.stopBlocker())
+            new InstantCommand(() -> intake.resetBlocker())
+        );
+
+        operator.y().whileTrue(
+            new InstantCommand(() -> intake.manualBlocker(-0.1))
+        ).onFalse(
+            new InstantCommand(() -> intake.resetBlocker())
         );
 
         operator.povUp().onTrue(
@@ -245,11 +251,7 @@ public class RobotContainer {
         return Commands.sequence(
             // Reset our field centric heading to match the robot
             // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(
-                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-                ? Rotation2d.k180deg
-                : Rotation2d.kZero
-            )),
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg)),
             // Then slowly drive forward (away from us) for 5 seconds.
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(0.5)

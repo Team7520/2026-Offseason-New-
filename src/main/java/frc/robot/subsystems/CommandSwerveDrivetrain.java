@@ -241,11 +241,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command resetGyro() {
         return runOnce(() -> {
-            seedFieldCentric(
-                DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-                ? Rotation2d.k180deg
-                : Rotation2d.kZero
-            );
+            seedFieldCentric(Rotation2d.k180deg);
         });
     }
 

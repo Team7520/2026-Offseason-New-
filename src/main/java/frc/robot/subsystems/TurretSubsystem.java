@@ -119,7 +119,7 @@ public class TurretSubsystem extends SubsystemBase {
         encoder.getConfigurator().apply(cc_cfg);
 
         TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-        azimuthConfig.Slot0.kP = 75;
+        azimuthConfig.Slot0.kP = 100;
         azimuthConfig.Slot0.kI = 0;
         azimuthConfig.Slot0.kD = 0; // placeholder values
 
@@ -128,9 +128,9 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 100;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 85;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 50; // placeholder values
+        azimuthConfig.CurrentLimits.SupplyCurrentLimit = 60; // placeholder values
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
@@ -279,6 +279,7 @@ public class TurretSubsystem extends SubsystemBase {
                 return RobotZone.SHOOTING;
             }
         }
+        
     }
 
     public Command autoAim() {
@@ -335,7 +336,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                         double flightTime = 0.125 * currentDist + 0.665;
                         currentPose = drive.getPose();
-                        currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
+                        // currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
 
                         updatingHoodPos = getHoodFromDistance(updatingCurrentDist, far);
@@ -439,7 +440,7 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 33);
+        double b = SmartDashboard.getNumber("Flywheel b", 36.5);
         b += bTuning;
      //3.35
         double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
@@ -574,11 +575,11 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void bTuningUp() {
-        bTuning++;
+        bTuning += 0.5;
     }
 
     public void bTuningDown() {
-        bTuning--;
+        bTuning -= 0.5;
     }
 
     public void azimuthTuningRight() {
