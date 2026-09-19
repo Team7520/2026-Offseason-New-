@@ -328,6 +328,7 @@ public class RobotContainer {
     return routine.cmd();
 }
 public Command getAutonomousCommand() {
+    Commands.waitSeconds(1.5);
     return autoChooser.getSelected();
 }
 
