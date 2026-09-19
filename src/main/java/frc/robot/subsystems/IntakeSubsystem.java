@@ -82,9 +82,9 @@ public class IntakeSubsystem extends SubsystemBase {
     // BLOCKER functions
 
     public void setBlocker() {
-        if (extendMotor.getPosition().getValueAsDouble() > -1) {
+        if (extendMotor.getPosition().getValueAsDouble() > -2) {
             if (shotBlockUp == false) {
-                if (extendMotor.getPosition().getValueAsDouble() < -1) {
+                if (extendMotor.getPosition().getValueAsDouble() < -2) {
                     retract();
                 }
                 blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
@@ -186,7 +186,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean intakeDown() {
-        if (extendMotor.getPosition().getValueAsDouble() < -1) {
+        if (extendMotor.getPosition().getValueAsDouble() < -2) {
             return true;
         } else {
             return false;
@@ -195,7 +195,7 @@ public class IntakeSubsystem extends SubsystemBase {
 /*
     public void setBrakeMode() {
         double position = extendMotor.getPosition().getValueAsDouble();
-        if (position > -1) {
+        if (position > -2) {
             extendMotor.setNeutralMode(NeutralModeValue.Brake);
         } else {
             extendMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -269,7 +269,7 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Blocker Position", blockerMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
 
-        if (shotBlockUp && extendMotor.getPosition().getValueAsDouble() < -1) {
+        if (shotBlockUp && extendMotor.getPosition().getValueAsDouble() < -2) {
             retractWithSpeed(-0.3);
         }
     }

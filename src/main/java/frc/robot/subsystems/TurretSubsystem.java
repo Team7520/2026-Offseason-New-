@@ -81,7 +81,7 @@ public class TurretSubsystem extends SubsystemBase {
     private Pose2d feedDepotPose;
 
     double bTuning = 0;
-    double azimuthTuning = 0.78;
+    double azimuthTuning = 0.77;
 
     public TurretSubsystem(CommandSwerveDrivetrain drive) {
         this.drive = drive;
@@ -119,7 +119,7 @@ public class TurretSubsystem extends SubsystemBase {
         encoder.getConfigurator().apply(cc_cfg);
 
         TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-        azimuthConfig.Slot0.kP = 50;
+        azimuthConfig.Slot0.kP = 75;
         azimuthConfig.Slot0.kI = 0;
         azimuthConfig.Slot0.kD = 0; // placeholder values
 
@@ -335,7 +335,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                         double flightTime = 0.125 * currentDist + 0.665;
                         currentPose = drive.getPose();
-                        //currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
+                        currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
 
                         updatingHoodPos = getHoodFromDistance(updatingCurrentDist, far);
@@ -439,7 +439,7 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 28);
+        double b = SmartDashboard.getNumber("Flywheel b", 33);
         b += bTuning;
      //3.35
         double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
@@ -466,7 +466,7 @@ public class TurretSubsystem extends SubsystemBase {
     public double speedCutoff() {
     RobotZone zone = getRobotZone();
     if (zone == RobotZone.SHOOTING) {
-      return 0.4;
+      return 0.2;
     } else {
       return 1;
     }

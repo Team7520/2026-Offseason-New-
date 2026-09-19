@@ -21,7 +21,7 @@ public class DyerotorSubsystem extends SubsystemBase {
         wheelMotor = new TalonFX(DyeConstants.DYE_WHEEL_MOTOR_ID);
         
         TalonFXConfiguration rotateConfig = new TalonFXConfiguration();
-        rotateConfig.Slot0.kP = 1;
+        rotateConfig.Slot0.kP = 5;
         rotateConfig.Slot0.kI = 0;
         rotateConfig.Slot0.kD = 0; // placeholder values
         rotateConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

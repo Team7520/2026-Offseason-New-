@@ -43,7 +43,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class RobotContainer {
     private double speedCutoff = 1;
-    private double turnCutoff = 0.7;
+    private double turnCutoff = 0.9;
     // Subsystems
     private final TurretSubsystem turret;
     private final DyerotorSubsystem dyerotor;
@@ -130,7 +130,7 @@ public class RobotContainer {
         ).onFalse(
             new InstantCommand(
                 () -> {
-                  turnCutoff = 0.7;
+                  turnCutoff = 0.9;
                   speedCutoff = 1;
                 })
         );
