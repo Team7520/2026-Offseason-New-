@@ -281,10 +281,9 @@ public void followPath(SwerveSample sample) {
 
     public Command resetGyro() {
         return runOnce(() -> {
-            seedFieldCentric();
-        }
-    );
-}
+            seedFieldCentric(Rotation2d.k180deg);
+        });
+    }
 
     @Override
     public void periodic() {

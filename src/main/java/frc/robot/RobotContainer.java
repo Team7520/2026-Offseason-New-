@@ -19,6 +19,7 @@ import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -131,8 +132,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(driver.getLeftY() * MaxSpeed *speedCutoff) // Drive forward with negative Y (forward)
-                    .withVelocityY(driver.getLeftX() * MaxSpeed *speedCutoff) // Drive left with negative X (left)
+                drive.withVelocityX(-driver.getLeftY() * MaxSpeed *speedCutoff) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getLeftX() * MaxSpeed *speedCutoff) // Drive left with negative X (left)
                     .withRotationalRate(-driver.getRightX() * MaxAngularRate*turnCutoff) // Drive counterclockwise with negative X (left)
             )
             
@@ -219,6 +220,14 @@ public class RobotContainer {
         );
 
         driver.x().whileTrue(
+        drivetrain.applyRequest(() -> brake)
+        );
+
+        driver.y().whileTrue(
+        new ReverseWheels(dyerotor, -0.3, turret, -0.5)
+        );
+/*
+        driver.x().whileTrue(
             new InstantCommand(() -> turret.turn(0.2)))
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );
@@ -251,17 +260,7 @@ public class RobotContainer {
         ).onFalse(
             new InstantCommand(() -> turret.stopAll())
         );
-
-
-// Final x command: x-cross wheels
-        // drive.x().whileTrue(
-        // drivetrain.applyRequest(() -> brake)
-        // );
-
-// Final y command: reverse shooter and dye wheels
-        // driver.y().whileTrue(
-        // new ReverseWheels(dyerotor, -0.3, turret, -0.5)
-        // );
+*/
 
         // operator commands
 
