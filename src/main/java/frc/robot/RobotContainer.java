@@ -59,9 +59,10 @@ public class RobotContainer {
     private final TurretSubsystem turret;
     private final DyerotorSubsystem dyerotor;
     private final IntakeSubsystem intake;
-    //shooting
-    final ShootAndIndex shootCommand;
 
+    // Auto Stuff
+    private final InstantCommand shootCommand;
+    private final Command dyerotorCommand;
     private final Command intakeCommand;
 
 
@@ -102,11 +103,9 @@ public class RobotContainer {
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
-        shootCommand = new ShootAndIndex(dyerotor, turret);
-        intakeCommand = Commands.run(() -> {
-            System.out.println("Intake running...");
-            intake.manualExtend(0.5);
-        }, intake);
+        dyerotorCommand = new ShootAndIndex(dyerotor, turret);
+        shootCommand = new InstantCommand(() -> turret.shootCommand());
+        intakeCommand = new ExtendAndRunIntake(intake, 0.9);
 
         // Configure the button bindings
         configureBindings();
@@ -161,20 +160,21 @@ public class RobotContainer {
         );
 
         driver
-        .rightTrigger()
-        .whileTrue(turret.shootCommand())
-        .onTrue(
+        .rightTrigger().whileTrue(
+            turret.shootCommand()
+        ).onTrue(
             new InstantCommand(
                 () -> {
                   turnCutoff = turret.turnCutOff();
                   speedCutoff = turret.speedCutoff();
-                }))
-        .onFalse(
+                })
+        ).onFalse(
             new InstantCommand(
                 () -> {
                   turnCutoff = 0.7;
                   speedCutoff = 1;
-                }));
+                })
+        );
         
         driver.leftTrigger().whileTrue(
             new ExtendAndRunIntake(intake, 0.9)
@@ -312,6 +312,7 @@ public class RobotContainer {
     traj.atTime("ShootOn").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT: Shoot ON");
+            dyerotorCommand.schedule();
             shootCommand.schedule();
         })
     );
@@ -319,6 +320,7 @@ public class RobotContainer {
     traj.atTime("ShootOff").onTrue(
         Commands.runOnce(() -> {
             System.out.println("CHOREO EVENT: Shoot OFF");
+            dyerotorCommand.cancel();
             shootCommand.cancel();
         })
     );
