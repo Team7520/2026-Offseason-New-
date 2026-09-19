@@ -219,6 +219,22 @@ public class RobotContainer {
             new InstantCommand(() -> intake.stopBlocker())
         );
 
+        operator.povUp().onTrue(
+            new InstantCommand(() -> turret.bTuningUp())
+        );
+
+        operator.povDown().onTrue(
+            new InstantCommand(() -> turret.bTuningDown())
+        );
+
+        operator.povLeft().onTrue(
+            new InstantCommand(() -> turret.azimuthTuningLeft())
+        );
+
+        operator.povRight().onTrue(
+            new InstantCommand(() -> turret.azimuthTuningRight())
+        );
+
         drivetrain.registerTelemetry(logger::telemeterize);
         turret.setDefaultCommand(turret.autoAim());
     }

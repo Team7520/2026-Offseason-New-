@@ -84,11 +84,20 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setBlocker() {
         if (extendMotor.getPosition().getValueAsDouble() > -1) {
             if (shotBlockUp == false) {
+                if (extendMotor.getPosition().getValueAsDouble() < -1) {
+                    retract();
+                }
                 blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
                 shotBlockUp = true;
             } else {
                 blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
                 shotBlockUp = false;
+            }
+        } else {
+            if (shotBlockUp == false) {
+                retract();
+                blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_EXTEND));
+                shotBlockUp = true;
             }
         }
     }

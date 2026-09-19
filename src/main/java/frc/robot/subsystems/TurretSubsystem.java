@@ -80,6 +80,9 @@ public class TurretSubsystem extends SubsystemBase {
     private Pose2d feedOutpostPose;
     private Pose2d feedDepotPose;
 
+    double bTuning = 0;
+    double azimuthTuning = 0.78;
+
     public TurretSubsystem(CommandSwerveDrivetrain drive) {
         this.drive = drive;
 
@@ -125,7 +128,7 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 80;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 100;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         azimuthConfig.CurrentLimits.SupplyCurrentLimit = 50; // placeholder values
 
@@ -218,8 +221,9 @@ public class TurretSubsystem extends SubsystemBase {
         Translation2d turretToGoal = goalPose.getTranslation().minus(turretPose.getTranslation());
         Rotation2d fieldAngle = turretToGoal.getAngle();
         turretPosePublisher.set(turretPose);
-
-        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(0.77 * Math.PI)); // Adjust for turret offset angle
+        //tuneAzimuthRotation;
+        
+        return fieldAngle.minus(robotPose.getRotation()).plus(new Rotation2d(azimuthTuning * Math.PI)); // Adjust for turret offset angle
     }
 
 
@@ -331,7 +335,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                         double flightTime = 0.125 * currentDist + 0.665;
                         currentPose = drive.getPose();
-                        currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
+                        //currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
 
                         updatingHoodPos = getHoodFromDistance(updatingCurrentDist, far);
@@ -425,7 +429,7 @@ public class TurretSubsystem extends SubsystemBase {
             distance += 3;
         }
         double scaleFactor = 10;//SmartDashboard.getNumber("Hood scaleFactor", 20.0);
-        double con = 10;// SmartDashboard.getNumber("Hood con", 10.0);
+        double con = 11;// SmartDashboard.getNumber("Hood con", 10.0);
 
         double hoodPos = (distance - 1) * scaleFactor + con;
         return hoodPos;
@@ -435,7 +439,8 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 24);
+        double b = SmartDashboard.getNumber("Flywheel b", 28);
+        b += bTuning;
      //3.35
         double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
         // double rpsPerDistance = 0.08;
@@ -568,6 +573,22 @@ public class TurretSubsystem extends SubsystemBase {
         return error < 0.01;
     }
 
+    public void bTuningUp() {
+        bTuning++;
+    }
+
+    public void bTuningDown() {
+        bTuning--;
+    }
+
+    public void azimuthTuningRight() {
+        azimuthTuning += 0.05;
+    }
+
+    public void azimuthTuningLeft() {
+        azimuthTuning -= 0.05;
+    }
+
 
     @Override
     public void periodic() {
@@ -579,6 +600,8 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Hood Adjustment Requested", hoodAdjust);
         SmartDashboard.putString("Robot Zone", getRobotZone().toString());
         SmartDashboard.putNumber("Azimuth Angle", azimuthMotor.getPosition().getValueAsDouble() * 360);
+        SmartDashboard.putNumber("bTuning Value", bTuning);
+        SmartDashboard.putNumber("AzimuthTuning Value", azimuthTuning);
         SmartDashboard.putNumber("Flywheel Left RPS", topMotorLeft.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Flywheel Right RPS", topMotorRight.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Flywheel Left Voltage", topMotorLeft.getMotorVoltage().getValueAsDouble());
