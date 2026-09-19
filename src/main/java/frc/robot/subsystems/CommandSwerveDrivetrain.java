@@ -240,10 +240,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command resetGyro() {
         return runOnce(() -> {
-            seedFieldCentric();
-        }
-    );
-}
+            seedFieldCentric(Rotation2d.k180deg);
+        });
+    }
 
     @Override
     public void periodic() {

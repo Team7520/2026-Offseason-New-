@@ -16,6 +16,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -90,8 +91,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(driver.getLeftY() * MaxSpeed *speedCutoff) // Drive forward with negative Y (forward)
-                    .withVelocityY(driver.getLeftX() * MaxSpeed *speedCutoff) // Drive left with negative X (left)
+                drive.withVelocityX(-driver.getLeftY() * MaxSpeed *speedCutoff) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getLeftX() * MaxSpeed *speedCutoff) // Drive left with negative X (left)
                     .withRotationalRate(-driver.getRightX() * MaxAngularRate*turnCutoff) // Drive counterclockwise with negative X (left)
             )
             
@@ -156,6 +157,14 @@ public class RobotContainer {
         );
 
         driver.x().whileTrue(
+        drivetrain.applyRequest(() -> brake)
+        );
+
+        driver.y().whileTrue(
+        new ReverseWheels(dyerotor, -0.3, turret, -0.5)
+        );
+/*
+        driver.x().whileTrue(
             new InstantCommand(() -> turret.turn(0.2)))
         .onFalse(new InstantCommand(() -> turret.stopAll())
         );
@@ -188,17 +197,7 @@ public class RobotContainer {
         ).onFalse(
             new InstantCommand(() -> turret.stopAll())
         );
-
-
-// Final x command: x-cross wheels
-        // drive.x().whileTrue(
-        // drivetrain.applyRequest(() -> brake)
-        // );
-
-// Final y command: reverse shooter and dye wheels
-        // driver.y().whileTrue(
-        // new ReverseWheels(dyerotor, -0.3, turret, -0.5)
-        // );
+*/
 
         // operator commands
 
@@ -230,7 +229,11 @@ public class RobotContainer {
         return Commands.sequence(
             // Reset our field centric heading to match the robot
             // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(
+                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+                ? Rotation2d.k180deg
+                : Rotation2d.kZero
+            )),
             // Then slowly drive forward (away from us) for 5 seconds.
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(0.5)
