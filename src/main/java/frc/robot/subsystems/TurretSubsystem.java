@@ -244,14 +244,19 @@ public class TurretSubsystem extends SubsystemBase {
         double xPosition = turretPose.getX();
         double yPosition = turretPose.getY();
         double xRobotPosition = drive.getPose().getX();
-
+        // check if robot is under any trench
+        if (xPosition <= 13 && xPosition >= 11) {
+            return RobotZone.UNDER_FAR_TRENCH;
+        } else if (xRobotPosition <= 13 && xRobotPosition >= 11) {
+            return RobotZone.UNDER_FAR_TRENCH;
+        } else if (xPosition <= 5.5 && xPosition >= 3.7) {
+            return RobotZone.UNDER_FAR_TRENCH;
+        } else if (xRobotPosition <= 5.5 && xRobotPosition >= 3.7) {
+            return RobotZone.UNDER_FAR_TRENCH;
+        }
         if (alliance == Alliance.Red) {
             // RED ALLIANCE
-            if (xPosition <= 13 && xPosition >= 11) {
-                return RobotZone.UNDER_FAR_TRENCH;
-            } else if (xRobotPosition <= 13 && xRobotPosition >= 11) {
-                return RobotZone.UNDER_FAR_TRENCH;
-            } else if (xPosition <= 11) {
+            if (xPosition <= 11) {
                 if (yPosition >= UniverseConstants.fieldWidthMidpoint) {
                     return RobotZone.RED_FEEDING_OUTPOST;
                 } else {
@@ -262,11 +267,7 @@ public class TurretSubsystem extends SubsystemBase {
             }
         } else {
             // BLUE ALLIANCE
-            if (xPosition <= 5.5 && xPosition >= 3.7) {
-                return RobotZone.UNDER_FAR_TRENCH;
-            } else if (xRobotPosition <= 5.5 && xRobotPosition >= 3.7) {
-                return RobotZone.UNDER_FAR_TRENCH;
-            } else if (xPosition >= 6) {
+            if (xPosition >= 6) {
                 if (yPosition >= UniverseConstants.fieldWidthMidpoint) {
                     return RobotZone.BLUE_FEEDING_OUTPOST;
                 } else {
@@ -580,6 +581,7 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Hood Voltage", hoodMotor.getMotorVoltage().getValueAsDouble());
         SmartDashboard.putBoolean("Hood Adjustment Requested", hoodAdjust);
         SmartDashboard.putString("Robot Zone", getRobotZone().toString());
+        SmartDashboard.putNumber("Azimuth Angle", azimuthMotor.getPosition().getValueAsDouble() * 360);
         SmartDashboard.putNumber("Flywheel Left RPS", topMotorLeft.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Flywheel Right RPS", topMotorRight.getVelocity().getValueAsDouble());
         SmartDashboard.putNumber("Flywheel Left Voltage", topMotorLeft.getMotorVoltage().getValueAsDouble());
