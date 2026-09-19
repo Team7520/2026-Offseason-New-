@@ -23,8 +23,9 @@ public class ExtendAndRunIntake extends Command {
   public void execute() {
     intake.extend();
     intake.runIntake(speed);
+    System.out.println("Intake Running");
     if (timer.hasElapsed(0.7)) {
-      intake.stopIntake();
+      intake.stopExtend();
     }
   }
 

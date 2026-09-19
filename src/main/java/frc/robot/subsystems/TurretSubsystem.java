@@ -247,7 +247,7 @@ public class TurretSubsystem extends SubsystemBase {
         // check if robot is under any trench
         if (xPosition <= 13 && xPosition >= 11) {
             return RobotZone.UNDER_FAR_TRENCH;
-        } else if (xRobotPosition <= 13 && xRobotPosition >= 11) {
+        } else if (xRobotPosition <= 12.7 && xRobotPosition >= 11) {
             return RobotZone.UNDER_FAR_TRENCH;
         } else if (xPosition <= 5.5 && xPosition >= 3.7) {
             return RobotZone.UNDER_FAR_TRENCH;
