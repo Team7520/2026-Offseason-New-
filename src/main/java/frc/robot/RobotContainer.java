@@ -291,7 +291,7 @@ public class RobotContainer {
         AutoTrajectory traj = routine.trajectory(trajectoryName);
 
         routine.active().onTrue(
-            Commands.waitSeconds(1.5).andThen(traj.resetOdometry().andThen(traj.cmd()))
+            Commands.waitSeconds(0).andThen(traj.resetOdometry().andThen(traj.cmd()))
         );
 
         traj.atTime("IntakeOn").onTrue(
@@ -330,14 +330,12 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         Command selectedAuto = autoChooser.getSelected();
+        drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg));
 
         if (selectedAuto == null) {
-            return drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg));
+            return Commands.none();
         }
 
-        return Commands.sequence(
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg)), 
-            selectedAuto
-        );
+        return selectedAuto;
     }
 }

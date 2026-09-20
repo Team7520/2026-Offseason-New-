@@ -128,7 +128,7 @@ public class TurretSubsystem extends SubsystemBase {
         azimuthConfig.Feedback.RotorToSensorRatio = TurretConstants.AZIMUTH_GEAR_RATIO;
 
         azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        azimuthConfig.CurrentLimits.StatorCurrentLimit = 85;
+        azimuthConfig.CurrentLimits.StatorCurrentLimit = 95;
         azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         azimuthConfig.CurrentLimits.SupplyCurrentLimit = 60; // placeholder values
 
@@ -378,44 +378,23 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public Command shootCommand() {
-    return Commands.defer(
-        () -> {
-          if (override) {
-            return Commands.parallel(
-                    Commands.run(
-                        () -> {
-                          setWheels = true;
-                          hoodAdjust = false;
-                        })
-                    )
-                .finallyDo(
-                    () -> {
-                      setWheels = false;
-                      stopFlywheels();
-                    });
-          }
-          RobotZone zone = getRobotZone();
-          if (zone == RobotZone.UNDER_FAR_TRENCH) {
-            return Commands.startEnd(
-                () -> {
-                  hoodAdjust = false;
-                },
-                () -> {});
-          } else {
-            return Commands.run(() -> {
+        return Commands.run(() -> {
+            if (override) {
                 setWheels = true;
-                hoodAdjust = true;
-                System.out.println("abcdefghijklmnop");
-            })
-            .finallyDo(() -> {
+                hoodAdjust = false;
+            } else if (getRobotZone() == RobotZone.UNDER_FAR_TRENCH) {
                 setWheels = false;
                 hoodAdjust = false;
-                System.out.println("1234567890");
-            });
-          }
-        },
-        java.util.Set.of());
-  }
+            } else {
+                setWheels = true;
+                hoodAdjust = true;
+            }
+        }).finallyDo(() -> {
+            setWheels = false;
+            hoodAdjust = false;
+            stopFlywheels();
+        });
+    }
 
     public double getDistance(Pose2d turretPose, Pose2d goalPose) {
         return turretPose.getTranslation().getDistance(goalPose.getTranslation());
@@ -440,10 +419,11 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 23);
+        double b = 20.5;
         b += bTuning;
+        SmartDashboard.putNumber("Flywheel b", b);
      //3.35
-        double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
+        double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 6);
         // double rpsPerDistance = 0.08;
         // double b = 0.4;
         double speed = rpsPerDistance * distance + b;
