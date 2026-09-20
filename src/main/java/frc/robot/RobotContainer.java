@@ -25,6 +25,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -56,6 +58,11 @@ public class RobotContainer {
     private final DyerotorSubsystem dyerotor;
     private final IntakeSubsystem intake;
 
+    // Auto Stuff
+    private final InstantCommand shootCommand;
+    private final Command dyerotorCommand;
+    private final Command intakeCommand;
+
     // Controller
     private final CommandXboxController driver = new CommandXboxController(0);
         private final CommandXboxController operator = new CommandXboxController(1);
@@ -75,14 +82,37 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    private final AutoFactory autoFactory = new AutoFactory (
+        drivetrain::getPose,
+        drivetrain::resetPose,
+        drivetrain::followPath,
+        true,          // mirror trajectory based on alliance
+        drivetrain
+    );
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
     public RobotContainer() {
         turret = new TurretSubsystem(drivetrain);
         dyerotor = new DyerotorSubsystem();
         intake = new IntakeSubsystem();
 
+        dyerotorCommand = new ShootAndIndex(dyerotor, turret);
+        shootCommand = new InstantCommand(() -> turret.shootCommand());
+        intakeCommand = new ExtendAndRunIntake(intake, 0.9);
+
         // Configure the button bindings
         configureBindings();
+
+        // Autos
+        autoChooser.setDefaultOption("Double Swipe Top", buildAuto("DoubleSwipeTop"));
+        autoChooser.addOption("Double Swipe Bottom", buildAuto("DoubleSwipeBottom"));
+        autoChooser.addOption("8ball", buildAuto("Sneaky8Ball"));
+        autoChooser.addOption("Do Nothing", Commands.none());
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
+
+
 
     // public void setLocation(List<EstimatedRobotPose> visionEsts) {
     //     for (var est : visionEsts) {
@@ -252,22 +282,58 @@ public class RobotContainer {
         turret.setDefaultCommand(turret.autoAim());
     }
 
+    private Command buildAuto(String trajectoryName) {
+        AutoRoutine routine = autoFactory.newRoutine(trajectoryName);
+        AutoTrajectory traj = routine.trajectory(trajectoryName);
+
+        routine.active().onTrue(
+            Commands.waitSeconds(1.5).andThen(traj.resetOdometry().andThen(traj.cmd()))
+        );
+
+        traj.atTime("IntakeOn").onTrue(
+            Commands.runOnce(() -> {
+                System.out.println("CHOREO EVENT TRIGGERED: IntakeOn!");
+                intakeCommand.schedule();
+            })
+        );
+
+        traj.atTime("IntakeOff").onTrue(
+            Commands.runOnce(() -> {
+                System.out.println("CHOREO EVENT TRIGGERED: IntakeOff!");
+                intakeCommand.cancel();
+                intake.stopAll();
+            })
+        );
+
+        traj.atTime("ShootOn").onTrue(
+            Commands.runOnce(() -> {
+                System.out.println("CHOREO EVENT: Shoot ON");
+                dyerotorCommand.schedule();
+                shootCommand.schedule();
+            })
+        );
+
+        traj.atTime("ShootOff").onTrue(
+            Commands.runOnce(() -> {
+                System.out.println("CHOREO EVENT: Shoot OFF");
+                dyerotorCommand.cancel();
+                shootCommand.cancel();
+            })
+        );
+
+        return routine.cmd();
+    }
+
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
+        Command selectedAuto = autoChooser.getSelected();
+
+        if (selectedAuto == null) {
+            return drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg));
+        }
+
         return Commands.sequence(
-            // Reset our field centric heading to match the robot
-            // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg)),
-            // Then slowly drive forward (away from us) for 5 seconds.
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)
-            )
-            .withTimeout(5.0),
-            // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.k180deg)), 
+            selectedAuto
         );
     }
 }

@@ -10,9 +10,11 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -45,6 +47,42 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    private final PIDController m_pathXController = new PIDController(10, 0, 0);
+    private final PIDController m_pathYController = new PIDController(10, 0, 0);
+    private final PhoenixPIDController m_pathThetaController = new PhoenixPIDController(0, 0, 0);
+
+    private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds =
+        new SwerveRequest.ApplyFieldSpeeds();
+
+    {
+        m_pathThetaController.enableContinuousInput(-Math.PI, Math.PI);
+    }
+
+    public void followPath(SwerveSample sample) {
+        Pose2d pose = getState().Pose;
+
+        // Build speeds from raw sample fields directly, bypassing getChassisSpeeds()
+        ChassisSpeeds targetSpeeds = new ChassisSpeeds(sample.vx, sample.vy, sample.omega);
+
+        targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(pose.getX(), sample.x);
+        targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(pose.getY(), sample.y);
+        targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
+            pose.getRotation().getRadians(),
+            sample.heading,
+            Utils.getCurrentTimeSeconds()
+        );
+
+        ChassisSpeeds discretized = ChassisSpeeds.discretize(targetSpeeds, 0.02);
+        double headingError = sample.heading - pose.getRotation().getRadians();
+
+        setControl(
+            m_pathApplyFieldSpeeds
+                .withSpeeds(discretized)
+                .withWheelForceFeedforwardsX(sample.moduleForcesX())
+                .withWheelForceFeedforwardsY(sample.moduleForcesY())
+        );
+    }
+
     Vision vision = new Vision();
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
