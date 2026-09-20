@@ -59,7 +59,7 @@ public class RobotContainer {
     private final IntakeSubsystem intake;
 
     // Auto Stuff
-    private final InstantCommand shootCommand;
+    private final Command shootCommand;
     private final Command dyerotorCommand;
     private final Command intakeCommand;
 
@@ -97,7 +97,7 @@ public class RobotContainer {
         intake = new IntakeSubsystem();
 
         dyerotorCommand = new ShootAndIndex(dyerotor, turret);
-        shootCommand = new InstantCommand(() -> turret.shootCommand());
+        shootCommand = turret.shootCommand();
         intakeCommand = new ExtendAndRunIntake(intake, 0.9);
 
         // Configure the button bindings
@@ -276,6 +276,10 @@ public class RobotContainer {
 
         operator.povRight().onTrue(
             new InstantCommand(() -> turret.azimuthTuningRight())
+        );
+
+        operator.leftTrigger().onTrue(
+            new InstantCommand(() -> turret.resetAzimuthTuning())
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);

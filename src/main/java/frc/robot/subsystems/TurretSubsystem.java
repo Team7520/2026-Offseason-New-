@@ -440,7 +440,7 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 36.5);
+        double b = SmartDashboard.getNumber("Flywheel b", 26);
         b += bTuning;
      //3.35
         double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
@@ -588,6 +588,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void azimuthTuningLeft() {
         azimuthTuning -= 0.05;
+    }
+
+    public void resetAzimuthTuning() {
+        azimuthTuning = 0.77;
     }
 
 
