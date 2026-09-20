@@ -251,13 +251,13 @@ public class RobotContainer {
         );
 
         operator.a().whileTrue(
-            new InstantCommand(() -> intake.manualBlocker(0.1))
+            new InstantCommand(() -> intake.manualBlocker(0.2))
         ).onFalse(
             new InstantCommand(() -> intake.resetBlocker())
         );
 
         operator.y().whileTrue(
-            new InstantCommand(() -> intake.manualBlocker(-0.1))
+            new InstantCommand(() -> intake.manualBlocker(-0.2))
         ).onFalse(
             new InstantCommand(() -> intake.resetBlocker())
         );

@@ -272,10 +272,11 @@ public class IntakeSubsystem extends SubsystemBase {
 //        System.out.println("Blocker position: " + blockerMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Intake Position", extendMotor.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Blocker Position", blockerMotor.getPosition().getValueAsDouble());
+        SmartDashboard.putBoolean("Blocker Up", shotBlockUp);
         SmartDashboard.putNumber("Intake deploy current", extendMotor.getTorqueCurrent().getValueAsDouble());
 
         if (shotBlockUp && extendMotor.getPosition().getValueAsDouble() < -2) {
-            retractWithSpeed(-0.3);
+            retractWithSpeed(-0.9);
         }
     }
 }

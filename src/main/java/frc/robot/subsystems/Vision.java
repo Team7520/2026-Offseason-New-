@@ -135,13 +135,13 @@ public class Vision {
         Transform3d robotToCamera = robotToCameras[index];
         PhotonTrackedTarget target = result.getBestTarget();
         if (target != null) {
-            // if (target.getFiducialId() == 1 || target.getFiducialId() == 12 || target.getFiducialId() == 6 || target.getFiducialId() == 7) {
-            //     // RED TRENCH
-            //     return null;
-            // } else if (target.getFiducialId() == 17 || target.getFiducialId() == 28 || target.getFiducialId() == 22 || target.getFiducialId() == 23) {
-            //     // BLUE TRENCH
-            //     return null;
-            // }
+            if (target.getFiducialId() == 1 || target.getFiducialId() == 12 || target.getFiducialId() == 6 || target.getFiducialId() == 7) {
+                // RED TRENCH
+                return null;
+            } else if (target.getFiducialId() == 17 || target.getFiducialId() == 28 || target.getFiducialId() == 22 || target.getFiducialId() == 23) {
+                // BLUE TRENCH
+                return null;
+            }
             Pose3d robotPose =
                 PhotonUtils.estimateFieldToRobotAprilTag(
                 target.getBestCameraToTarget(),

@@ -8,7 +8,7 @@
         "https://frcmaven.wpi.edu/artifactory/sleipnirgroup-mvn-release/",
         "https://repo1.maven.org/maven2"
     ],
-    "jsonUrl": "https://choreo.autos/lib/ChoreoLib2026.json",
+    "jsonUrl": "https://lib.choreo.autos/dep/ChoreoLib2026.json",
     "javaDependencies": [
         {
             "groupId": "choreo",

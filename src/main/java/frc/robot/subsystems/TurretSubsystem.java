@@ -336,7 +336,7 @@ public class TurretSubsystem extends SubsystemBase {
 
                         double flightTime = 0.125 * currentDist + 0.665;
                         currentPose = drive.getPose();
-                        // currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
+                        currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
 
                         updatingHoodPos = getHoodFromDistance(updatingCurrentDist, far);
@@ -440,7 +440,7 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 26);
+        double b = SmartDashboard.getNumber("Flywheel b", 23);
         b += bTuning;
      //3.35
         double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
@@ -583,11 +583,11 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void azimuthTuningRight() {
-        azimuthTuning += 0.05;
+        azimuthTuning -= 0.05;
     }
 
     public void azimuthTuningLeft() {
-        azimuthTuning -= 0.05;
+        azimuthTuning += 0.05;
     }
 
     public void resetAzimuthTuning() {
