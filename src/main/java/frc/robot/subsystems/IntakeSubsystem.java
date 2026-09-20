@@ -152,9 +152,9 @@ public class IntakeSubsystem extends SubsystemBase {
             blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
             shotBlockUp = false;
         }
-        if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
+        // if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
             extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND).withEnableFOC(true));
-        }
+        // }
 //        setBrakeMode();
     }
 
