@@ -23,16 +23,16 @@ public class ExtendAndRunIntake extends Command {
   public void execute() {
     intake.extend();
     intake.runIntake(speed);
-    // if (timer.hasElapsed(0.7)) {
-    //   intake.stopExtend();
-    // }
+    if (timer.hasElapsed(1)) {
+      intake.stopExtend();
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
     intake.stopIntake();
-    // intake.stopAll();
-    // timer.stop();
-    // timer.reset();
+    intake.stopAll();
+    timer.stop();
+    timer.reset();
   }
 }

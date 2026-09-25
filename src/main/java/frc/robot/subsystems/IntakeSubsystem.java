@@ -152,9 +152,9 @@ public class IntakeSubsystem extends SubsystemBase {
             blockerMotor.setControl(positionRequest.withPosition(IntakeConstants.BLOCKER_RETRACT));
             shotBlockUp = false;
         }
-        // if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
+        if (extendMotor.getPosition().getValueAsDouble() > IntakeConstants.INTAKE_EXTEND) {
             extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_EXTEND).withEnableFOC(true));
-        // }
+        }
 //        setBrakeMode();
     }
 
@@ -249,7 +249,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void stopExtend() {
-        extendMotor.setControl(duty.withOutput(0));
+        if (extendMotor.getPosition().getValueAsDouble() <= -0.5) {
+            extendMotor.setControl(duty.withOutput(0));
+        }
     }
 
     public void stopBlocker() {
