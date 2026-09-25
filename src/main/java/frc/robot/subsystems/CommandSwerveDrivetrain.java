@@ -49,7 +49,7 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
     private final PIDController m_pathXController = new PIDController(10, 0, 0);
     private final PIDController m_pathYController = new PIDController(10, 0, 0);
-    private final PhoenixPIDController m_pathThetaController = new PhoenixPIDController(10, 0, 0);
+    private final PhoenixPIDController m_pathThetaController = new PhoenixPIDController(0, 0, 0);
 
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds =
         new SwerveRequest.ApplyFieldSpeeds();
