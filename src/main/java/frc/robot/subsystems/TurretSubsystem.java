@@ -419,10 +419,13 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = SmartDashboard.getNumber("Flywheel b", 23);
+        double b = 22;
+        SmartDashboard.putNumber("Flywheel b", b);
         b += bTuning;
      //3.35
-        double rpsPerDistance = SmartDashboard.getNumber("Flywheel rpsPerDistance", 7);
+        
+        double rpsPerDistance = 6.5;
+        SmartDashboard.putNumber("Flywheel rpsPerDistance", rpsPerDistance);
         // double rpsPerDistance = 0.08;
         // double b = 0.4;
         double speed = rpsPerDistance * distance + b;
