@@ -81,7 +81,7 @@ public class TurretSubsystem extends SubsystemBase {
     private Pose2d feedDepotPose;
 
     double bTuning = 0;
-    double azimuthTuning = 0.77;
+    double azimuthTuning = 0.73;
 
     public TurretSubsystem(CommandSwerveDrivetrain drive) {
         this.drive = drive;
@@ -233,7 +233,7 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Current Speed VY", currentSpeed.vyMetersPerSecond);
         return new Pose2d(
             robotPose.getX() + currentSpeed.vxMetersPerSecond * (odometryLatency + timeOfFlight),
-            robotPose.getY() + currentSpeed.vyMetersPerSecond * (timeOfFlight + odometryLatency),
+            robotPose.getY() + currentSpeed.vyMetersPerSecond * (odometryLatency + timeOfFlight),
             robotPose.getRotation().plus(new Rotation2d(currentSpeed.omegaRadiansPerSecond * odometryLatency))
         );
     }
@@ -334,7 +334,7 @@ public class TurretSubsystem extends SubsystemBase {
                         // 0.13
                         double odometryLatency = 0.1;
 
-                        double flightTime = 0.125 * currentDist + 0.665;
+                        double flightTime = 0.175 * currentDist + 0.325; // Value needs to be tuned
                         currentPose = drive.getPose();
                         currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
@@ -408,8 +408,8 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 3;
         }
-        double scaleFactor = 10;//SmartDashboard.getNumber("Hood scaleFactor", 20.0);
-        double con = 11;// SmartDashboard.getNumber("Hood con", 10.0);
+        double scaleFactor = 10; //SmartDashboard.getNumber("Hood scaleFactor", 20.0);
+        double con = 11; // SmartDashboard.getNumber("Hood con", 10.0);
 
         double hoodPos = (distance - 1) * scaleFactor + con;
         return hoodPos;
@@ -419,12 +419,12 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = 22;
-        SmartDashboard.putNumber("Flywheel b", b);
+        double b = 23;
         b += bTuning;
+        SmartDashboard.putNumber("Flywheel b", b);
      //3.35
         
-        double rpsPerDistance = 6.5;
+        double rpsPerDistance = 6;
         SmartDashboard.putNumber("Flywheel rpsPerDistance", rpsPerDistance);
         // double rpsPerDistance = 0.08;
         // double b = 0.4;
@@ -573,7 +573,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void resetAzimuthTuning() {
-        azimuthTuning = 0.77;
+        azimuthTuning = 0.73;
     }
 
 

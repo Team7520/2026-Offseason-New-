@@ -51,7 +51,7 @@ import frc.robot.subsystems.DyerotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem; 
 
 public class RobotContainer {
-    private double speedCutoff = 1;
+    private double speedCutoff = 0.4;
     private double turnCutoff = 0.9;
     // Subsystems
     private final TurretSubsystem turret;
@@ -68,7 +68,7 @@ public class RobotContainer {
         private final CommandXboxController operator = new CommandXboxController(1);
 
 
-    private double MaxSpeed = 0.3 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -168,7 +168,7 @@ public class RobotContainer {
             new InstantCommand(
                 () -> {
                   turnCutoff = 0.9;
-                  speedCutoff = 1;
+                  speedCutoff = 0.4;
                 })
         );
         
