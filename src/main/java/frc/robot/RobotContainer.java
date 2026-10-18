@@ -51,7 +51,7 @@ import frc.robot.subsystems.DyerotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem; 
 
 public class RobotContainer {
-    private double speedCutoff = 0.4;
+    private double speedCutoff = 0.25;
     private double turnCutoff = 0.9;
     // Subsystems
     private final TurretSubsystem turret;
@@ -238,6 +238,14 @@ public class RobotContainer {
 
         operator.rightTrigger().whileTrue(
             turret.turnHood(-0.1).finallyDo(() -> turret.hood(0))
+        );
+
+        operator.leftTrigger().whileTrue(
+            new InstantCommand(() -> intake.resetExtendDown())
+        );
+
+        operator.leftBumper().whileTrue(
+            new InstantCommand(() -> intake.resetExtendUp())
         );
 
         operator.x().onTrue(

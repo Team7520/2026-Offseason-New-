@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX blockerMotor;
     private final DutyCycleOut duty = new DutyCycleOut(0);
     private final PositionDutyCycle pos = new PositionDutyCycle(0);
-    private final double CURRENT_THRESHOLD = -20; // placeholder value
+    private final double CURRENT_THRESHOLD = -8;
     private final PositionVoltage positionRequest = new PositionVoltage(0);
     boolean shotBlockUp = false;
 
@@ -225,6 +225,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command retractIntake() {
         return Commands.run(() -> retract(), this).until(() -> atTarget(IntakeConstants.INTAKE_RETRACT));
+    }
+
+    public void resetExtendUp() {
+        extendMotor.setControl(duty.withOutput(0));
+        extendMotor.setPosition(IntakeConstants.INTAKE_RETRACT);
+    }
+
+    public void resetExtendDown() {
+        extendMotor.setControl(duty.withOutput(0));
+        extendMotor.setPosition(IntakeConstants.INTAKE_EXTEND);
     }
 
     public Command slowRetract() {
