@@ -174,7 +174,11 @@ public class RobotContainer {
         
         driver.leftTrigger().whileTrue(
             new ExtendAndRunIntake(intake, 0.9)
-        );
+        .alongWith(
+            Commands.repeatingSequence(
+                new InstantCommand(() -> intake.setNeutralforCurrent())
+            )
+        ));
 
         driver.rightBumper().whileTrue(
             intake.spinRoller(-0.9)

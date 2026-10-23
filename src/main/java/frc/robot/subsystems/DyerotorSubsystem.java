@@ -25,9 +25,9 @@ public class DyerotorSubsystem extends SubsystemBase {
         rotateConfig.Slot0.kI = 0;
         rotateConfig.Slot0.kD = 0; // placeholder values
         rotateConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        rotateConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        rotateConfig.CurrentLimits.SupplyCurrentLimit = 70;
         rotateConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        rotateConfig.CurrentLimits.StatorCurrentLimit = 40; // placeholder values
+        rotateConfig.CurrentLimits.StatorCurrentLimit = 45; // placeholder values
 
         rotateMotor.getConfigurator().apply(rotateConfig);
         rotateMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);
