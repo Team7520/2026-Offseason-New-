@@ -29,7 +29,7 @@ public class ShootAndIndex extends Command {
       dyerotor.spinWheel(0.9);
     }
     if (timer.hasElapsed(0.35)) {
-      dyerotor.spinDye(0.6);
+      dyerotor.spinDye(0.7);
     }
   }
 
