@@ -134,9 +134,9 @@ public class TurretSubsystem extends SubsystemBase {
 
         SoftwareLimitSwitchConfigs azimuthLimits = new SoftwareLimitSwitchConfigs();
         azimuthLimits.ForwardSoftLimitEnable = true;
-        azimuthLimits.ForwardSoftLimitThreshold = 0.72;
+        azimuthLimits.ForwardSoftLimitThreshold = TurretConstants.TURRET_FORWARD_LIMIT + 0.02;
         azimuthLimits.ReverseSoftLimitEnable = true;
-        azimuthLimits.ReverseSoftLimitThreshold = -0.72;
+        azimuthLimits.ReverseSoftLimitThreshold = TurretConstants.TURRET_REVERSE_LIMIT - 0.02;
 
         azimuthConfig.SoftwareLimitSwitch = azimuthLimits;
         azimuthConfig.Feedback.SensorToMechanismRatio = 1;
@@ -334,7 +334,7 @@ public class TurretSubsystem extends SubsystemBase {
                         // 0.13
                         double odometryLatency = 0.1;
 
-                        double flightTime = 0.175 * currentDist + 0.325; // Value needs to be tuned
+                        double flightTime = 0.200 * currentDist + 0.250; // Value needs to be tuned
                         currentPose = drive.getPose();
                         currentPose = predictFuturePose(robotPose, flightTime, odometryLatency);
                         updatingCurrentDist = getDistance(currentPose, targetPose);
@@ -419,15 +419,18 @@ public class TurretSubsystem extends SubsystemBase {
         if (far) {
             distance += 2;
         }
-        double b = 23;
+        double b = 25;
         b += bTuning;
         SmartDashboard.putNumber("Flywheel b", b);
      //3.35
         
-        double rpsPerDistance = 6;
+        double rpsPerDistance = 5.5;
         SmartDashboard.putNumber("Flywheel rpsPerDistance", rpsPerDistance);
         // double rpsPerDistance = 0.08;
         // double b = 0.4;
+        if (distance > 3.5 && distance < 4) {
+            b -= 0.5;
+        }
         double speed = rpsPerDistance * distance + b;
 
         // for testing
