@@ -259,7 +259,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void stopExtend() {
-        if (extendMotor.getPosition().getValueAsDouble() <= -0.5) {
+        if (extendMotor.getPosition().getValueAsDouble() >= -0.5) {
             extendMotor.setControl(duty.withOutput(0));
         }
     }

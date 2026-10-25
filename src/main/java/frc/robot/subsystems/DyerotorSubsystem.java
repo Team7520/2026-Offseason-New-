@@ -27,7 +27,7 @@ public class DyerotorSubsystem extends SubsystemBase {
         rotateConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         rotateConfig.CurrentLimits.SupplyCurrentLimit = 70;
         rotateConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        rotateConfig.CurrentLimits.StatorCurrentLimit = 45; // placeholder values
+        rotateConfig.CurrentLimits.StatorCurrentLimit = 50;
 
         rotateMotor.getConfigurator().apply(rotateConfig);
         rotateMotor.setNeutralMode(com.ctre.phoenix6.signals.NeutralModeValue.Brake);

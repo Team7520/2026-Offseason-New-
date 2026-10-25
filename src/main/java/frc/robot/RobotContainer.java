@@ -51,7 +51,7 @@ import frc.robot.subsystems.DyerotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem; 
 
 public class RobotContainer {
-    private double speedCutoff = 0.25;
+    private double speedCutoff = UniverseConstants.ROBOT_SPEED;
     private double turnCutoff = 0.9;
     // Subsystems
     private final TurretSubsystem turret;
@@ -168,7 +168,7 @@ public class RobotContainer {
             new InstantCommand(
                 () -> {
                   turnCutoff = 0.9;
-                  speedCutoff = 0.4;
+                  speedCutoff = UniverseConstants.ROBOT_SPEED;
                 })
         );
         
