@@ -39,7 +39,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.UniverseConstants;
 import frc.robot.commands.ExtendAndRunIntake;
 import frc.robot.commands.GoToAzimuth;
-import frc.robot.commands.IntakeAgitation;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseWheels;
 import frc.robot.commands.ShootAndIndex;
@@ -174,11 +173,7 @@ public class RobotContainer {
         
         driver.leftTrigger().whileTrue(
             new ExtendAndRunIntake(intake, 0.9)
-        .alongWith(
-            Commands.repeatingSequence(
-                new InstantCommand(() -> intake.setNeutralforCurrent())
-            )
-        ));
+        );
 
         driver.rightBumper().whileTrue(
             intake.spinRoller(-0.9)
