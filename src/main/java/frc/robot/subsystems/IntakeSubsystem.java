@@ -159,13 +159,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void retractWithSpeed(double speed) {
         extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withVelocity(speed).withEnableFOC(true));
-        setBrakeMode();
+        // setBrakeMode();
         stopIntake();
     }
 
     public void retract() {
         extendMotor.setControl(pos.withPosition(IntakeConstants.INTAKE_RETRACT).withEnableFOC(true));
-        setBrakeMode();
+        // setBrakeMode();
         stopIntake();
     }
 

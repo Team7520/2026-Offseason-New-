@@ -25,7 +25,7 @@ public class DyerotorSubsystem extends SubsystemBase {
         rotateConfig.Slot0.kI = 0;
         rotateConfig.Slot0.kD = 0; // placeholder values
         rotateConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        rotateConfig.CurrentLimits.SupplyCurrentLimit = 70;
+        rotateConfig.CurrentLimits.SupplyCurrentLimit = 75;
         rotateConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         rotateConfig.CurrentLimits.StatorCurrentLimit = 50;
 

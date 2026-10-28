@@ -93,6 +93,6 @@ public class Constants {
         public static double fieldLengthMidpoint = fieldLength / 2;
 
         public static double g = 9.81;
-        public static double ROBOT_SPEED = 0.25;
+        public static double ROBOT_SPEED = 0.5;
     }
 }
