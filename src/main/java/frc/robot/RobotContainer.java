@@ -106,6 +106,7 @@ public class RobotContainer {
         autoChooser.setDefaultOption("DoubleSwipeDepot", buildAuto("DoubleSwipeDepot"));
         autoChooser.addOption("DoubleSwipeOutpost", buildAuto("DoubleSwipeOutpost"));
         autoChooser.addOption("SingleSwipeOutpost", buildAuto("SingleSwipeOutpost"));
+        autoChooser.addOption("SingleSwipeOutpostBackMove", buildAuto("SingleSwipeOutpostBackMove"));
         autoChooser.addOption("SingleSwipeDepot", buildAuto("SingleSwipeDepot"));
         autoChooser.addOption("8ball", buildAuto("Sneaky8Ball"));
         autoChooser.addOption("Do Nothing", Commands.none());
