@@ -20,6 +20,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Vision {
 
@@ -142,6 +144,18 @@ public class Vision {
                 // BLUE TRENCH
                 return null;
             }
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                if (target.getFiducialId() == 3 || target.getFiducialId() == 4) {
+                    return null;
+                    // RED HUB POINTING TO CENTER
+                }
+            } else if (DriverStation.getAlliance().get() == Alliance.Blue) {
+                if (target.getFiducialId() == 19 || target.getFiducialId() == 20) {
+                    return null;
+                    // BLUE HUB POINTING TO CENTER
+                }
+            }
+            
             Pose3d robotPose =
                 PhotonUtils.estimateFieldToRobotAprilTag(
                 target.getBestCameraToTarget(),
